@@ -5,6 +5,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using Toolbox.Tools;
+using WatcherRepository.Application;
 
 namespace WatcherRepository.Test.Application
 {
@@ -12,7 +13,7 @@ namespace WatcherRepository.Test.Application
     {
         private const string _jsonResourceId = "WatcherRepository.Test.Application.DevConfig.json";
 
-        public IWatcherOption Build()
+        public IWatcherOption Build(params string[] args)
         {
             using Stream stream = Assembly
                 .GetAssembly(typeof(TestOptionBuilder))!
@@ -22,6 +23,7 @@ namespace WatcherRepository.Test.Application
             IConfiguration config = new ConfigurationBuilder()
                 .AddJsonStream(stream)
                 .AddUserSecrets("WatcherRepository.Test")
+                .AddCommandLine(args)
                 .Build();
 
             WatcherOption option = new WatcherOption();

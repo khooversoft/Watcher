@@ -3,6 +3,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading;
 using System.Threading.Tasks;
+using WatcherRepository.Application;
+using WatcherRepository.Records;
 using WatcherRepository.Test.Application;
 
 namespace WatcherRepository.Test
@@ -17,8 +19,7 @@ namespace WatcherRepository.Test
 
         public DatabaseTests()
         {
-            _loggerFactory = new TestLoggerBuilder().Build();
-            _watcherOption = new TestOptionBuilder().Build();
+            _watcherOption = new TestOptionBuilder().Build($"databaseName={_databaseName}");
         }
 
         [TestMethod]
@@ -26,13 +27,13 @@ namespace WatcherRepository.Test
         {
             // Arrange
             IWatcherRepository watcherRepository = new WatcherRepository(_watcherOption, _loggerFactory);
-            await watcherRepository.DeleteDatabase(_databaseName);
+            await watcherRepository.Database.Delete(_databaseName);
 
             // Act
-            await watcherRepository.CreateDatabase(_databaseName);
+            await watcherRepository.Database.Create(_databaseName);
 
             // Assert
-            (await watcherRepository.DeleteDatabase(_databaseName)).Should().BeTrue();
+            (await watcherRepository.Database.Delete(_databaseName)).Should().BeTrue();
         }
 
         [TestMethod]
@@ -40,15 +41,15 @@ namespace WatcherRepository.Test
         {
             // Arrange
             IWatcherRepository watcherRepository = new WatcherRepository(_watcherOption, _loggerFactory);
-            await watcherRepository.DeleteDatabase(_databaseName);
+            await watcherRepository.Database.Delete(_databaseName);
 
             // Act
-            WatcherContainer<TestItem> container = await watcherRepository.CreateContainer<TestItem>(_databaseName, _containerName, partitionKey: "/header");
+            RecordContainer<TestItem> container = await watcherRepository.Container.Create<TestItem>(_containerName, partitionKey: "/header");
             container.Should().NotBeNull();
 
             // Assert
-            (await watcherRepository.DeleteContainer(_databaseName, _containerName)).Should().BeTrue();
-            (await watcherRepository.DeleteDatabase(_databaseName)).Should().BeTrue();
+            (await watcherRepository.Container.Delete(_containerName)).Should().BeTrue();
+            (await watcherRepository.Database.Delete(_databaseName)).Should().BeTrue();
         }
 
         [TestMethod]
@@ -56,16 +57,19 @@ namespace WatcherRepository.Test
         {
             // Arrange
             IWatcherRepository watcherRepository = new WatcherRepository(_watcherOption, _loggerFactory);
-            await watcherRepository.DeleteDatabase(_databaseName);
+            await watcherRepository.Database.Delete(_databaseName);
 
             // Act
-            WatcherContainer<TestItem> container = await watcherRepository.CreateContainer<TestItem>(_databaseName, _containerName, partitionKey: "/header");
+            RecordContainer<TestItem> container = await watcherRepository.Container.Create<TestItem>(_containerName, partitionKey: "/header");
             container.Should().NotBeNull();
 
             // Assert
-            (await watcherRepository.DeleteDatabase(_databaseName)).Should().BeTrue();
+            (await watcherRepository.Database.Delete(_databaseName)).Should().BeTrue();
         }
 
-        private class TestItem { }
+        private class TestItem : IRecord
+        {
+            public void Prepare() => throw new System.NotImplementedException();
+        }
     }
 }

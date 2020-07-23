@@ -1,7 +1,4 @@
 ﻿{
   "ConnectionString": "AccountEndpoint=https://watcher-test.documents.azure.com:443/;AccountKey={AccountKey};",
-  "AccountKey": "<fromSecret>",
-  "TraceTTL": 30,
-  "Environment": "dev",
-  "Tenant": "unitTest"
+  "AccountKey": "<fromSecret>"
 }

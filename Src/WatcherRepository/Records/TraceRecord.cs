@@ -3,11 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
+using Toolbox.Tools;
 using WatcherRepository.Models;
 
 namespace WatcherRepository.Records
 {
-    public class TraceRecord
+    public class TraceRecord : IRecord
     {
         [JsonProperty("id")]
         public string Id { get; set; } = Guid.NewGuid().ToString();
@@ -29,7 +30,7 @@ namespace WatcherRepository.Records
         public override bool Equals(object? obj)
         {
             return obj is TraceRecord record &&
-                   Id == record.Id &&
+                   Id.ToLowerInvariant() == record.Id.ToLowerInvariant() &&
                    Timestamp == record.Timestamp &&
                    TargetId == record.TargetId &&
                    AgentId == record.AgentId &&
@@ -40,6 +41,8 @@ namespace WatcherRepository.Records
         }
 
         public override int GetHashCode() => HashCode.Combine(Id, Timestamp, TargetId, AgentId, Url, HttpStatusCode, Body, TargetState);
+
+        public void Prepare() => Id = Id.VerifyNotEmpty(nameof(Id)).ToLowerInvariant();
 
         public static bool operator ==(TraceRecord? left, TraceRecord? right) => EqualityComparer<TraceRecord>.Default.Equals(left!, right!);
 

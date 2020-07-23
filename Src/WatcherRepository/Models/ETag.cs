@@ -28,7 +28,7 @@ namespace WatcherRepository.Models
 
         public static bool operator !=(ETag? left, ETag? right) => !(left == right);
 
-        public static implicit operator string(ETag eTag) => eTag.Value;
+        public static implicit operator string?(ETag? eTag) => eTag?.Value;
 
         public static explicit operator ETag(string eTag) => new ETag(eTag);
     }

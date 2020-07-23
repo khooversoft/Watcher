@@ -9,16 +9,17 @@ using Toolbox.Tools;
 using Toolbox.Extensions;
 using WatcherRepository.Models;
 using System.Net;
+using Toolbox.Services;
+using WatcherRepository.Records;
 
 namespace WatcherRepository
 {
-    public class WatcherContainer<T>
-        where T : class
+    public class RecordContainer<T> : IRecordContainer<T> where T : class, IRecord
     {
         private readonly Container _container;
-        private readonly ILogger<WatcherContainer<T>> _logger;
+        private readonly ILogger<T> _logger;
 
-        private readonly HashSet<int> _validStatusCode = new HashSet<int>(new[]
+        private static readonly HashSet<int> _validStatusCode = new HashSet<int>(new[]
         {
             (int)HttpStatusCode.OK,
             (int)HttpStatusCode.Created,
@@ -26,7 +27,7 @@ namespace WatcherRepository
             (int)HttpStatusCode.NoContent,
         });
 
-        public WatcherContainer(Container container, ILogger<WatcherContainer<T>> logger)
+        public RecordContainer(Container container, ILogger<T> logger)
         {
             container.VerifyNotNull(nameof(container));
 
@@ -34,22 +35,23 @@ namespace WatcherRepository
             _logger = logger;
         }
 
-        public static string DefaultPartitionKey = "/id";
-
         public string ContainerName => _container.Id;
 
-        public async Task<ETag> Set(T item, string? eTag = null, CancellationToken token = default)
-        {
-            item.VerifyNotNull(nameof(item));
+        public Task<ETag> Set(T item, CancellationToken token = default) => Set(new Record<T>(item));
 
-            _logger.LogTrace($"{nameof(Set)}: {nameof(_container.UpsertItemAsync)} item, ");
+        public async Task<ETag> Set(Record<T> record, CancellationToken token = default)
+        {
+            record.VerifyNotNull(nameof(record));
+            record.Prepare();
+
+            _logger.LogTrace($"{nameof(Set)}: {nameof(_container.UpsertItemAsync)} item, {Json.Default.Serialize(record.Value)}");
 
             var option = new ItemRequestOptions
             {
-                IfMatchEtag = eTag
+                IfMatchEtag = record.ETag!,
             };
 
-            ItemResponse<T> itemResponse = await _container.UpsertItemAsync(item, requestOptions: option, cancellationToken: token);
+            ItemResponse<T> itemResponse = await _container.UpsertItemAsync(record.Value, requestOptions: option, cancellationToken: token);
 
             itemResponse.VerifyAssert(x => IsValid(x.StatusCode), x =>
             {
@@ -61,9 +63,11 @@ namespace WatcherRepository
             return (ETag)itemResponse.ETag;
         }
 
-        public async Task<T?> Get(string id, string? partitionKey = null, CancellationToken token = default)
+        public async Task<Record<T>?> Get(string id, string? partitionKey = null, CancellationToken token = default)
         {
-            id.VerifyNotEmpty(nameof(id));
+            id = id
+                .VerifyNotEmpty(nameof(id))
+                .ToLowerInvariant();
 
             try
             {
@@ -71,12 +75,12 @@ namespace WatcherRepository
 
                 itemResponse.VerifyAssert(x => IsValid(x.StatusCode), x =>
                 {
-                    string msg = $"{nameof(Get)}: Failed to {nameof(_container.UpsertItemAsync)} in getting id={id}, StatusCode={x.StatusCode}";
+                    string msg = $"{nameof(Get)}: Failed to {nameof(_container.ReadItemAsync)} in getting id={id}, StatusCode={x.StatusCode}";
                     _logger.LogError(msg);
                     return msg;
                 });
 
-                return itemResponse.StatusCode == HttpStatusCode.OK ? itemResponse.Resource : default;
+                return itemResponse.StatusCode == HttpStatusCode.OK ? new Record<T>(itemResponse.Resource, (ETag)itemResponse.ETag) : default;
             }
             catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
             {
@@ -87,7 +91,9 @@ namespace WatcherRepository
 
         public async Task<bool> Delete(string id, string? eTag = null, string? partitionKey = null, CancellationToken token = default)
         {
-            id.VerifyNotEmpty(nameof(id));
+            id = id
+                .VerifyNotEmpty(nameof(id))
+                .ToLowerInvariant();
 
             _logger.LogTrace($"{nameof(Delete)}: Deleting {id}, eTag={eTag}");
 
@@ -102,7 +108,7 @@ namespace WatcherRepository
 
                 itemResponse.VerifyAssert(x => IsValid(x.StatusCode), x =>
                 {
-                    string msg = $"{nameof(Delete)}: Failed to {nameof(_container.UpsertItemAsync)}, StatusCode={x.StatusCode}";
+                    string msg = $"{nameof(Delete)}: Failed to {nameof(_container.DeleteItemAsync)}, StatusCode={x.StatusCode}";
                     _logger.LogError(msg);
                     return msg;
                 });
@@ -116,6 +122,12 @@ namespace WatcherRepository
             }
         }
 
+        public async Task<bool> Exist(string id, CancellationToken token = default) =>
+            (await Search($"select * from ROOT r where r.id = \"{id.VerifyNotEmpty(nameof(id)).ToLowerInvariant()}\"", token))
+            .Count > 0;
+
+        public Task<IReadOnlyList<T>> ListAll(CancellationToken token = default) => Search("select * from ROOT", token);
+
         public async Task<IReadOnlyList<T>> Search(string sqlQuery, CancellationToken token = default)
         {
             sqlQuery.VerifyNotEmpty(nameof(sqlQuery));
@@ -123,14 +135,13 @@ namespace WatcherRepository
             var list = new List<T>();
 
             _logger.LogTrace($"{nameof(Search)}: Query={sqlQuery}");
-
             var queryDefinition = new QueryDefinition(sqlQuery);
 
             using FeedIterator<T> feedIterator = _container.GetItemQueryIterator<T>(queryDefinition);
 
             while (feedIterator.HasMoreResults)
             {
-                foreach (var item in await feedIterator.ReadNextAsync())
+                foreach (T item in await feedIterator.ReadNextAsync())
                 {
                     list.Add(item);
                 }
