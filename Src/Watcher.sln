@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WatcherSdk", "WatcherSdk\Wa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WatcherAgent", "WatcherAgent\WatcherAgent.csproj", "{A809DF1B-2A31-4F55-AC6D-B868C44F3011}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WatcherRepository", "WatcherRepository\WatcherRepository.csproj", "{451BBDEB-B8B5-46AE-8873-FEB7C9DDAFE4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Watcher.Cosmos.Repository", "Watcher.Cosmos.Repository\Watcher.Cosmos.Repository.csproj", "{451BBDEB-B8B5-46AE-8873-FEB7C9DDAFE4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WatcherCmd", "WatcherCmd\WatcherCmd.csproj", "{5A17FAAD-803A-4D1E-8804-D6CB19C10C57}"
 EndProject
@@ -19,7 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{75EEBA2D-4
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Toolbox.Test", "..\Test\Toolbox.Test\Toolbox.Test.csproj", "{ECE7F48A-5AE5-4EBE-84B9-5EABC81857A9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WatcherRepository.Test", "..\Test\WatcherRepository.Test\WatcherRepository.Test.csproj", "{D503F7E6-A902-45DE-B9B0-56164E76B428}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Watcher.Repository.Test", "..\Test\Cosmos.Watcher.Repository.Test\Cosmos.Watcher.Repository.Test.csproj", "{D503F7E6-A902-45DE-B9B0-56164E76B428}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8D773647-4999-4261-B593-DCE118FFF509}"
 	ProjectSection(SolutionItems) = preProject
