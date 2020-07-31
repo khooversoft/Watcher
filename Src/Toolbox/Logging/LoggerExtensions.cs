@@ -10,7 +10,7 @@ namespace Toolbox.Logging
 {
     public static class LoggerExtensions
     {
-        public static ILoggingBuilder AddFile(this ILoggingBuilder builder, string loggingFolder, string baseLogFileName, int limit = 10)
+        public static ILoggingBuilder AddLogFile(this ILoggingBuilder builder, string loggingFolder, string baseLogFileName, int limit = 10)
         {
             builder.AddProvider(new FileLoggerProvider(loggingFolder, baseLogFileName, limit));
             return builder;

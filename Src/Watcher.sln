@@ -26,6 +26,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WatcherCmd.Test", "..\Test\WatcherCmd.Test\WatcherCmd.Test.csproj", "{D3ABF806-8A72-443F-B870-037F35C3ECAC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -64,6 +66,10 @@ Global
 		{D503F7E6-A902-45DE-B9B0-56164E76B428}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D503F7E6-A902-45DE-B9B0-56164E76B428}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D503F7E6-A902-45DE-B9B0-56164E76B428}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3ABF806-8A72-443F-B870-037F35C3ECAC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3ABF806-8A72-443F-B870-037F35C3ECAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3ABF806-8A72-443F-B870-037F35C3ECAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3ABF806-8A72-443F-B870-037F35C3ECAC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -71,6 +77,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{ECE7F48A-5AE5-4EBE-84B9-5EABC81857A9} = {75EEBA2D-4B60-4EE9-876C-65FE70892232}
 		{D503F7E6-A902-45DE-B9B0-56164E76B428} = {75EEBA2D-4B60-4EE9-876C-65FE70892232}
+		{D3ABF806-8A72-443F-B870-037F35C3ECAC} = {75EEBA2D-4B60-4EE9-876C-65FE70892232}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8C14CF57-DFE6-4818-9A38-4ED713B74AD0}

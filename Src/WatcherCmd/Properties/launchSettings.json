@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "WatcherCmd": {
+      "commandName": "Project",
+      "commandLineArgs": "dkd"
+    }
+  }
+}

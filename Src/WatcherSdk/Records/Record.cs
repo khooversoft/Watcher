@@ -27,6 +27,8 @@ namespace WatcherSdk.Records
         public T Value { get; }
         public ETag? ETag { get; }
 
+        public string Id => Value.Id;
+
         public void Prepare() => Value.Prepare();
     }
 }

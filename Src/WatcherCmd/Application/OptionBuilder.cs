@@ -22,9 +22,15 @@ namespace WatcherCmd.Application
 
         public string? ConfigFile { get; set; }
 
-        public OptionBuilder AddCommandLine(params string[] args)
+        public OptionBuilder SetArgs(params string[] args)
         {
             Args = args.ToArray();
+            return this;
+        }
+
+        public OptionBuilder SetConfigFile(string configFile)
+        {
+            ConfigFile = configFile;
             return this;
         }
 
@@ -47,8 +53,6 @@ namespace WatcherCmd.Application
             string? secretId = null;
             string? accountKey = null;
             Option option = null!;
-
-            Func<string, string> createAccountKeyCommand = x => $"{nameof(option.Store)}:{nameof(option.Store.AccountKey)}=" + x;
 
             // Because ordering or placement on critical configuration can different, loop through a process
             // of building the correct configuration.  Pattern cases below are in priority order.
@@ -75,23 +79,25 @@ namespace WatcherCmd.Application
                         secretId = v.SecretId;
                         continue;
 
-                    case Option v when v.Store?.AccountKey.ToNullIfEmpty() == null && accountKey == null:
+                    case Option v when option.KeyVault?.KeyVaultName.IsEmpty() == true && v.Store?.AccountKey.IsEmpty() == false && accountKey == null:
                         accountKey = GetAccountKeyFromKeyVault(option);
                         if (accountKey != null) continue;
-                        break;
+                        continue;
                 }
 
                 break;
             };
 
-            if (option.Store?.AccountKey.ToNullIfEmpty() != null)
+            if (!option.Store?.AccountKey.IsEmpty() == false)
             {
-                option.SecretFilter = new SecretFilter(new[] { option.Store.AccountKey! });
+                option.SecretFilter = new SecretFilter(new[] { option.Store?.AccountKey! });
             }
 
             option.Verify();
 
             return option;
+
+            static string createAccountKeyCommand(string value) => $"{nameof(option.Store)}:{nameof(option.Store.AccountKey)}=" + value.VerifyNotEmpty(nameof(value));
         }
 
         private string GetAccountKeyFromKeyVault(Option option)

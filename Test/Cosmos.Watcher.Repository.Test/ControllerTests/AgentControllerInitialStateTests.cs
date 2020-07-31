@@ -1,21 +1,16 @@
 ﻿using Cosmos.Watcher.Repository.Test.Application;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Watcher.Cosmos.Repository;
 using Watcher.Cosmos.Repository.Application;
 using WatcherSdk.Records;
 using WatcherSdk.Repository;
+using Xunit;
 
 namespace Cosmos.Watcher.Repository.Test.ControllerTests
 {
-    [TestClass]
     public class AgentControllerInitialStateTests
     {
         private readonly ILoggerFactory _loggerFactory = new TestLoggerBuilder().Build();
@@ -28,7 +23,7 @@ namespace Cosmos.Watcher.Repository.Test.ControllerTests
             _watcherOption = new TestOptionBuilder().Build($"DatabaseName={_databaseName}");
         }
 
-        [TestMethod]
+        [Fact]
         public async Task GivenNoAgentsAndNoTargets_WhenGetAssignments_NoTargetsReturn()
         {
             // Arrange
@@ -54,7 +49,7 @@ namespace Cosmos.Watcher.Repository.Test.ControllerTests
             await watcherRepository.Database.Delete(_databaseName);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task GivenOneAgentswithNoTargets_WhenGetAssignments_NoTargetsReturn()
         {
             // Arrange
@@ -78,7 +73,7 @@ namespace Cosmos.Watcher.Repository.Test.ControllerTests
             await watcherRepository.Database.Delete(_databaseName);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task GiveNoAgentsAndOneTarget_WhenGetAssignments_NoTargetsReturn()
         {
             // Arrange

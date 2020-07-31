@@ -1,23 +1,18 @@
 ﻿using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Toolbox.Tools;
+using Xunit;
 
 namespace Toolbox.Test
 {
-    [TestClass]
     public class StringVectorTests
     {
-        [TestMethod]
-        [DataRow("first", new string[] { "first" }, true)]
-        [DataRow(@"first\second", new string[] { @"first\second" }, true)]
-        [DataRow("first/second", new string[] { "first", "second" }, true)]
-        [DataRow("first/second/third", new string[] { "first", "second", "third" }, true)]
-        [DataRow("first/second/third", new string[] { "first", "second", "third" }, true)]
-        public void StringVectorPrimaryTest(string value, string[] vectors, bool test)
+        [Theory]
+        [InlineData("first", new string[] { "first" })]
+        [InlineData(@"first\second", new string[] { @"first\second" })]
+        [InlineData("first/second", new string[] { "first", "second" })]
+        [InlineData("first/second/third", new string[] { "first", "second", "third" })]
+        public void StringVectorPrimaryTest(string value, string[] vectors)
         {
             StringVector sv = StringVector.Parse(value);
 
@@ -28,10 +23,10 @@ namespace Toolbox.Test
             sv.ToString().Should().Be(value ?? string.Empty);
         }
 
-        [TestMethod]
-        [DataRow(null, new string[0], true)]
-        [DataRow("", new string[0], true)]
-        public void StringVectorFailureTest(string value, string[] vectors, bool test)
+        [Theory]
+        [InlineData(null, new string[0])]
+        [InlineData("", new string[0])]
+        public void StringVectorFailureTest(string value, string[] vectors)
         {
             StringVector sv = StringVector.Parse(value);
 

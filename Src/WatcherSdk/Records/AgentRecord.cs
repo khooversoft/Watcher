@@ -16,6 +16,8 @@ namespace WatcherSdk.Records
 
         public DateTime UtcHeartbeat { get; set; } = DateTime.UtcNow;
 
+        public void Prepare() => Id = Id.VerifyNotEmpty(nameof(Id)).ToLowerInvariant();
+
         public override bool Equals(object? obj)
         {
             return obj is AgentRecord record &&
@@ -26,7 +28,7 @@ namespace WatcherSdk.Records
 
         public override int GetHashCode() => HashCode.Combine(Id, State, UtcHeartbeat);
 
-        public void Prepare() => Id = Id.VerifyNotEmpty(nameof(Id)).ToLowerInvariant();
+        public override string ToString() => $"Id={Id}, State={State}, UtcHeartbeat={UtcHeartbeat}";
 
         public static bool operator ==(AgentRecord? left, AgentRecord? right) => EqualityComparer<AgentRecord>.Default.Equals(left!, right!);
 

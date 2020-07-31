@@ -1,23 +1,20 @@
 ﻿using Cosmos.Watcher.Repository.Test.Application;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Toolbox.Extensions;
 using Watcher.Cosmos.Repository;
 using Watcher.Cosmos.Repository.Application;
 using WatcherSdk.Models;
 using WatcherSdk.Records;
 using WatcherSdk.Repository;
+using Xunit;
 
 namespace Cosmos.Watcher.Repository.Test.RecordTests
 {
-    [TestClass]
     public class AgentTests
     {
         private ILoggerFactory _loggerFactory = new TestLoggerBuilder().Build();
@@ -29,7 +26,7 @@ namespace Cosmos.Watcher.Repository.Test.RecordTests
             _watcherOption = new TestOptionBuilder().Build($"DatabaseName={_databaseName}");
         }
 
-        [TestMethod]
+        [Fact]
         public async Task GivenAgent_WhenRoundTrip_ShouldSucceed()
         {
             // Arrange
@@ -72,7 +69,7 @@ namespace Cosmos.Watcher.Repository.Test.RecordTests
         }
 
 
-        [TestMethod]
+        [Fact]
         public async Task GivenAgent_WhenDuplicatedAdded_ShouldSuccessAsUpdate()
         {
             // Arrange
@@ -109,7 +106,7 @@ namespace Cosmos.Watcher.Repository.Test.RecordTests
             (await watcherRepository.Database.Delete(_databaseName, CancellationToken.None)).Should().BeTrue();
         }
 
-        [TestMethod]
+        [Fact]
         public async Task GivenMultipleAgents_WhenRoundTrip_ShouldSuccess()
         {
             const int max = 10;

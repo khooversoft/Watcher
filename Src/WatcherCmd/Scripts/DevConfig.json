@@ -1,0 +1,31 @@
+{
+  "Agent": true,
+  //"Target": true,
+  //"Balance": true,
+  //"Assignment": true,
+
+  //"Create": true,
+  //"List": true,
+  //"Delete": true,
+  //"Clear": true,
+  "Template": true,
+
+  "SecretId": "WatcherCmd",
+  "File": "WatcherCmd",
+  "Id": "WatcherCmd",
+
+  "Store": {
+    "ConnectionString": "",
+    "AccountKey": "",
+    "TraceTraceTTL": "00:10:00",
+    "DatabaseName": "dev.monitoring",
+    "OfflineTolerance": "00:25:00",
+    "HeartbeatFrequency": "01:30:00"
+  }
+
+  //"KeyVault": {
+  //  "KeyVaultName": "{key vault name}",
+  //  "KeyName": "{key name}"
+  //}
+
+}

@@ -1,10 +1,6 @@
 ﻿using Cosmos.Watcher.Repository.Test.Application;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Watcher.Cosmos.Repository;
@@ -12,10 +8,10 @@ using Watcher.Cosmos.Repository.Application;
 using WatcherSdk.Models;
 using WatcherSdk.Records;
 using WatcherSdk.Repository;
+using Xunit;
 
 namespace Cosmos.Watcher.Repository.Test.ControllerTests
 {
-    [TestClass]
     public class AgentControllerRegisterTests
     {
         private readonly ILoggerFactory _loggerFactory = new TestLoggerBuilder().Build();
@@ -27,7 +23,7 @@ namespace Cosmos.Watcher.Repository.Test.ControllerTests
             _watcherOption = new TestOptionBuilder().Build($"DatabaseName={_databaseName}");
         }
 
-        [TestMethod]
+        [Fact]
         public async Task GivenAgent_WhenRegistgered_ShouldSucceed()
         {
             // Arrange
@@ -68,7 +64,7 @@ namespace Cosmos.Watcher.Repository.Test.ControllerTests
             await watcherRepository.Database.Delete(_databaseName);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task GivenAgent_WhenRegistgeredAndStateIsChange_ShouldSucceed()
         {
             // Arrange

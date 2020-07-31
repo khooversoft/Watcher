@@ -7,40 +7,47 @@ using WatcherSdk.Repository;
 using Toolbox.Tools;
 using System.Threading.Tasks;
 using System.Threading;
+using Toolbox.Services;
+using Microsoft.Extensions.Logging;
+using WatcherCmd.Tools;
+using System.IO;
+using WatcherSdk.Models;
+using System.Net;
 
 namespace WatcherCmd.Activities
 {
-    internal class TargetActivity
+    internal class TargetActivity : ActivityEntityBase<TargetRecord>
     {
-        private readonly IOption _option;
-        private readonly IRecordContainer<TargetRecord> _agentRecordContainer;
-
-        public TargetActivity(IOption option, IRecordContainer<TargetRecord> agentRecordContainer)
+        public TargetActivity(IOption option, IRecordContainer<TargetRecord> recordContainer, IJson json, ILogger<TargetActivity> logger)
+            : base(option, recordContainer, json, logger, "Target")
         {
-            option.VerifyNotNull(nameof(option));
-            agentRecordContainer.VerifyNotNull(nameof(agentRecordContainer));
-
-            _option = option;
-            _agentRecordContainer = agentRecordContainer;
         }
 
-        public Task Create(CancellationToken token)
+        public override Task CreateTemplate(CancellationToken token)
         {
-            return Task.CompletedTask;
-        }
+            var record = new TargetRecord
+            {
+                Id = "{targetId}",
+                Description = "{target description}",
+                Url = "{url of resource}",
+                StatusCodeMaps = new StatusCodeMap[]
+                {
+                    new StatusCodeMap { HttpStatusCode = HttpStatusCode.OK, State = TargetState.Ok },
+                    new StatusCodeMap { HttpStatusCode = HttpStatusCode.NotFound, State = TargetState.Error },
+                },
+                BodyElementMaps = new BodyElementMap[]
+                {
+                    new BodyElementMap { State = TargetState.Ok, Path = "/state", CompareTo = "success" },
+                    new BodyElementMap { State = TargetState.Error, Path = "/state", CompareTo = "error" },
+                },
+                TargetType = "{target type, REST}",
+                Enabled = true,
+                Frequency = TimeSpan.FromMinutes(5),
+            };
 
-        public Task List(CancellationToken token)
-        {
-            return Task.CompletedTask;
-        }
+            File.WriteAllText(_option.File, _json.Serialize(record));
+            _logger.LogInformation($"Create json template {_option.File} for Agent Assignment");
 
-        public Task Delete(CancellationToken token)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task Clear(CancellationToken token)
-        {
             return Task.CompletedTask;
         }
     }

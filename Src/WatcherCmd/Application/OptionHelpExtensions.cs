@@ -17,21 +17,30 @@ namespace WatcherCmd.Application
                 "List                  : List active models",
                 "ConfigFile            : Load JSON configuration file",
                 "",
-                "To work with Agent or Target records, specify the entity and operations." +
-                "Example: ",
+                "Balance               : Load balance Agent's assignments for Target",
                 "",
                 "",
+                "To work with Agent, Target records, specify the entity and operations" +
+                "     Example: Agent Create - Will create an agent record",
                 "",
                 "Entity",
                 "  Agent               : Operate on Agent records",
                 "  Target              : Operate on Target records",
+                "  Assignment          : Target assignment to agent",
                 "",
                 "Record operation records",
                 "  Create              : Create agent or target record",
                 "  List                : List agent or target records",
-                "  Delete              : Delete agent or target record",
+                "  List                :   If 'Id' is specified, only the entity will be returned",
+                "  Delete              : Delete agent or target record, required Id={id}",
                 "  Clear               : Delete all agent or target records",
+                "  Template            : Create template JSON file for specified entity, written to File={file}",
                 "",
+                "File={file}           : Json record file for 'Create' or 'Template' operation",
+                "                      :  Use the correct Json format for the Entity",
+                "                      :  Example: use Agent record for Agent entity",
+                "",
+                "Id={id}               : Id for the entity to list or delete",
                 "",
                 "Configuration for Watcher Repository (Cosmos DB)",
                 "",
@@ -45,7 +54,7 @@ namespace WatcherCmd.Application
                 "  Store:OfflineTolerance={data}             : Agent off-line tolerance time period. (TimeSpan format 'hh:mm:ss')",
                 "  Store:HeartbeatFrequency={data}           : Agent's heartbeat frequency time period. (TimeSpan format 'hh:mm:ss')",
                 "",
-                "  If 'BlobStore:AccountKey' is not specified then key vault will be used to retrieve the account key.",
+                "  If 'Store:AccountKey' is not specified then key vault will be used to retrieve the account key.",
                 "    KeyVault:KeyVaultName={keyVaultName}    : Name of the Azure key vault (required if 'Store:AccountKey' is not specified",
                 "    KeyVault:KeyName={keyName}              : Name of the Azure key vault's key where the 'Store:AcountKey' is stored",
             };
@@ -56,9 +65,9 @@ namespace WatcherCmd.Application
             const int maxWidth = 80;
 
             option.GetConfigValues()
+                .Append("Current configurations")
+                .Append(new string('=', maxWidth))
                 .Select(x => "  " + x)
-                .Prepend(new string('=', maxWidth))
-                .Prepend("Current configurations")
                 .Prepend(string.Empty)
                 .Append(string.Empty)
                 .Append(string.Empty)

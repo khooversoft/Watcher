@@ -1,17 +1,15 @@
 using Cosmos.Watcher.Repository.Test.Application;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Threading;
 using System.Threading.Tasks;
 using Watcher.Cosmos.Repository;
 using Watcher.Cosmos.Repository.Application;
 using WatcherSdk.Records;
 using WatcherSdk.Repository;
+using Xunit;
 
 namespace Cosmos.Watcher.Repository.Test
 {
-    [TestClass]
     public class DatabaseTests
     {
         private ILoggerFactory _loggerFactory = new TestLoggerBuilder().Build();
@@ -24,7 +22,7 @@ namespace Cosmos.Watcher.Repository.Test
             _watcherOption = new TestOptionBuilder().Build($"databaseName={_databaseName}");
         }
 
-        [TestMethod]
+        [Fact]
         public async Task GivenDatabase_WhenCreatedAndDeleted_ShouldSucceed()
         {
             // Arrange
@@ -38,7 +36,7 @@ namespace Cosmos.Watcher.Repository.Test
             (await watcherRepository.Database.Delete(_databaseName)).Should().BeTrue();
         }
 
-        [TestMethod]
+        [Fact]
         public async Task GivenContainer_WhenCreatedAndDeleted_ShouldSucceed()
         {
             // Arrange
@@ -54,7 +52,7 @@ namespace Cosmos.Watcher.Repository.Test
             (await watcherRepository.Database.Delete(_databaseName)).Should().BeTrue();
         }
 
-        [TestMethod]
+        [Fact]
         public async Task GivenContainer_WhenCreatedAndDatabaseDeleted_ShouldSucceed()
         {
             // Arrange
@@ -71,6 +69,8 @@ namespace Cosmos.Watcher.Repository.Test
 
         private class TestItem : IRecord
         {
+            public string Id => throw new System.NotImplementedException();
+
             public void Prepare() => throw new System.NotImplementedException();
         }
     }

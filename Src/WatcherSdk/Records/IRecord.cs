@@ -6,6 +6,8 @@ namespace WatcherSdk.Records
 {
     public interface IRecord
     {
+        string Id { get; }
+
         void Prepare();
     }
 }
