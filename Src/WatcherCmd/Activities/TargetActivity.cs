@@ -42,7 +42,7 @@ namespace WatcherCmd.Activities
                 },
                 TargetType = "{target type, REST}",
                 Enabled = true,
-                Frequency = TimeSpan.FromMinutes(5),
+                FrequencyInSeconds = (int)TimeSpan.FromMinutes(5).TotalSeconds,
             };
 
             File.WriteAllText(_option.File, _json.Serialize(record));

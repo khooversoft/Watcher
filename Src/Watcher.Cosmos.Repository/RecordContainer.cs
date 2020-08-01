@@ -15,7 +15,7 @@ using WatcherSdk.Repository;
 
 namespace Watcher.Cosmos.Repository
 {
-    public class RecordContainer<T> : IRecordContainer<T> where T : class, IRecord
+    public class RecordContainer<T> : IRecordContainer<T> where T : IRecord
     {
         private readonly Container _container;
         private readonly ILogger<T> _logger;

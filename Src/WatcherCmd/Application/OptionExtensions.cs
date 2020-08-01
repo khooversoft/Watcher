@@ -20,10 +20,10 @@ namespace WatcherCmd.Application
                 .Count()
                 .VerifyAssert(x => x == 1, "Must specify one of the following commands: Agent, Target, Assignment, Balance, or Help");
 
-        private static void IsOperation(Option option) => new[] { option.Create, option.List, option.Delete, option.Clear, option.Template }
+        private static void IsOperation(Option option) => new[] { option.Create, option.Get, option.List, option.Delete, option.Clear, option.Template }
                 .Where(x => x == true)
                 .Count()
-                .VerifyAssert(x => x == 1, "Must specify an action: Create, List, Delete, Clear, or Template");
+                .VerifyAssert(x => x == 1, "Must specify an action: Create, Get, List, Delete, Clear, or Template");
 
         private static void TestStore(Option option)
         {
@@ -45,15 +45,17 @@ namespace WatcherCmd.Application
                 IsOperation(option);
             }
 
-            if (option.Create || option.Template)
+            if (option.Get || option.Template) option.File.VerifyNotEmpty("Get or Template requires File={file}");
+
+            if (option.Create)
             {
-                if (option.File.IsEmpty()) throw new ArgumentException("Create or Template requires a 'File={file}' to input or create template for entity");
+                option.File.VerifyNotEmpty("Create requires File={file}");
                 if (!File.Exists(option.File)) throw new ArgumentException($"File {option.File} does not exist");
             }
 
-            if (option.Delete)
+            if (option.Get || option.Delete)
             {
-                if (option.Id.IsEmpty()) throw new ArgumentException("Delete requires a 'Id={id}' for the entity record id");
+                if (option.Id.IsEmpty()) throw new ArgumentException("Get or Delete requires a 'Id={id}' for the entity record id");
             }
 
             return option;
@@ -68,5 +70,5 @@ namespace WatcherCmd.Application
             configuration.Bind(option, x => x.BindNonPublicProperties = true);
             return option;
         }
-   }
+    }
 }

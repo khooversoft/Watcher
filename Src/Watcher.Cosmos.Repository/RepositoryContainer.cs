@@ -32,10 +32,12 @@ namespace Watcher.Cosmos.Repository
             _logger = logger;
         }
 
-        public Task<IRecordContainer<T>> Create<T>(TimeSpan? defaultTimeToLive = null, string? partitionKey = null, CancellationToken token = default) where T : class, IRecord =>
+        public Task<IRecordContainer<T>> Create<T>(TimeSpan? defaultTimeToLive = null, string? partitionKey = null, CancellationToken token = default)
+            where T : IRecord =>
             Create<T>(GetContainerName<T>(), defaultTimeToLive, partitionKey, token);
 
-        public async Task<IRecordContainer<T>> Create<T>(string containerName, TimeSpan? defaultTimeToLive = null, string? partitionKey = null, CancellationToken token = default) where T : class, IRecord
+        public async Task<IRecordContainer<T>> Create<T>(string containerName, TimeSpan? defaultTimeToLive = null, string? partitionKey = null, CancellationToken token = default)
+            where T : IRecord
         {
             containerName.VerifyNotEmpty(nameof(containerName));
             partitionKey = partitionKey.ToNullIfEmpty() ?? Constants.DefaultPartitionKey;

@@ -21,6 +21,7 @@ namespace WatcherCmd.Application
         public bool Balance { get; set; }
 
         public bool Create { get; set; }
+        public bool Get { get; set; }
         public bool List { get; set; }
         public bool Delete { get; set; }
         public bool Clear { get; set; }

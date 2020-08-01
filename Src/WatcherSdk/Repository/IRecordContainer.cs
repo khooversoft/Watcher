@@ -6,7 +6,7 @@ using WatcherSdk.Records;
 
 namespace WatcherSdk.Repository
 {
-    public interface IRecordContainer<T> where T : class, IRecord
+    public interface IRecordContainer<T> where T : IRecord
     {
         string ContainerName { get; }
 

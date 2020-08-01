@@ -6,7 +6,7 @@ using WatcherSdk.Models;
 
 namespace WatcherSdk.Records
 {
-    public class Record<T> : IRecord where T : class, IRecord
+    public class Record<T> : IRecordPrepare where T : IRecord
     {
         public Record(T value)
         {

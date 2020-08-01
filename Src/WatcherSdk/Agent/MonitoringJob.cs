@@ -26,7 +26,7 @@ namespace WatcherSdk.Agent
         {
             targetRecord.VerifyNotNull(nameof(targetRecord))
                 .VerifyAssert(x => !x.Url.IsEmpty(), x => nameof(x.Url))
-                .VerifyAssert(x => x.Frequency != null, x => nameof(x.Frequency));
+                .VerifyAssert(x => x.FrequencyInSeconds != null, x => nameof(x.FrequencyInSeconds));
 
             probe.VerifyNotNull(nameof(probe));
             logger.VerifyNotNull(nameof(logger));
@@ -53,7 +53,7 @@ namespace WatcherSdk.Agent
                     _logger.LogInformation($"{nameof(Start)}: Pinging target={_targetRecord}");
                     await _probe.Ping(token);
 
-                    await Task.Delay((TimeSpan)_targetRecord.Frequency!);
+                    await Task.Delay(TimeSpan.FromSeconds((double)_targetRecord.FrequencyInSeconds!));
                 }
 
                 tcs.SetResult(true);

@@ -22,6 +22,7 @@ namespace WatcherCmd.Test.Application
         {
             IConfiguration config = new ConfigurationBuilder()
                 .AddJsonStream(configStream)
+                .AddUserSecrets("WatcherCmd.Test")
                 .AddCommandLine(args.Select(x => x.Split('=', StringSplitOptions.RemoveEmptyEntries).Length == 1 ? x += "=true" : x).ToArray())
                 .Build();
 
@@ -62,10 +63,16 @@ namespace WatcherCmd.Test.Application
             fileName.VerifyNotEmpty(nameof(fileName));
             value.VerifyNotNull(nameof(value));
 
-            string file = Path.Combine(Path.GetTempPath(), "WatcherCmd.Test", fileName);
-            Directory.CreateDirectory(Path.GetDirectoryName(file));
+            string file = CreateTempFileName(fileName);
             File.WriteAllText(file, Json.Default.Serialize(value));
 
+            return file;
+        }
+
+        public static string CreateTempFileName(string fileName)
+        {
+            string file = Path.Combine(Path.GetTempPath(), "WatcherCmd.Test", Path.ChangeExtension(fileName, ".json"));
+            Directory.CreateDirectory(Path.GetDirectoryName(file));
             return file;
         }
     }

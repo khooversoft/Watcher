@@ -10,6 +10,7 @@ using Toolbox.Tools;
 using System.Threading.Tasks;
 using System.Threading;
 using WatcherCmd.Tools;
+using System.IO;
 
 namespace WatcherCmd.Activities
 {
@@ -44,11 +45,21 @@ namespace WatcherCmd.Activities
             await _recordContainer.Set(record, token);
         }
 
+        public async Task Get(CancellationToken token)
+        {
+            _logger.LogInformation($"{nameof(Get)}: Getting ID={_option.Id} and writing to file={_option.File}");
+
+            Record<T>? record = await _recordContainer.Get(_option.Id!, token: token);
+            record.VerifyNotNull($"Cannot read {_option.Id} for {_entityName}");
+
+            File.WriteAllText(_option.File, _json.Serialize(record.Value));
+        }
+
         public async Task List(CancellationToken token)
         {
             IReadOnlyList<T> list = await _recordContainer.ListAll(token);
 
-            _logger.LogInformation($"Listing all {_entityName} records");
+            _logger.LogInformation($"{nameof(List)}: Listing all {_entityName} records");
             foreach (var item in list)
             {
                 _logger.LogInformation($"Record={item}");
@@ -63,7 +74,7 @@ namespace WatcherCmd.Activities
 
         public async Task Clear(CancellationToken token)
         {
-            _logger.LogInformation($"{nameof(Create)}: Deleting ID={_option.Id}");
+            _logger.LogInformation($"{nameof(Clear)}: Deleting ID={_option.Id}");
             IReadOnlyList<T> list = await _recordContainer.ListAll(token);
 
             foreach (var item in list)

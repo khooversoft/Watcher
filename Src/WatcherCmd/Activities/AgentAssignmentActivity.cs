@@ -17,7 +17,7 @@ namespace WatcherCmd.Activities
     internal class AgentAssignmentActivity : ActivityEntityBase<AgentAssignmentRecord>
     {
         public AgentAssignmentActivity(IOption option, IRecordContainer<AgentAssignmentRecord> recordContainer, IJson json, ILogger<AgentAssignmentActivity> logger)
-            : base(option, recordContainer, json, logger, "Agent Assignment")
+            : base(option, recordContainer, json, logger, "AgentAssignment")
         {
         }
 

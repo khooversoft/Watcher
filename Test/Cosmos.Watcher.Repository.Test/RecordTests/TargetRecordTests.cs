@@ -174,7 +174,7 @@ namespace Cosmos.Watcher.Repository.Test.RecordTests
                 },
                 TargetType = "rest",
                 Enabled = true,
-                Frequency = TimeSpan.FromMinutes(5),
+                FrequencyInSeconds = (int)TimeSpan.FromMinutes(5).TotalSeconds,
             };
     }
 }

@@ -5,10 +5,8 @@ using System.Text;
 
 namespace WatcherSdk.Records
 {
-    public interface IRecord : IRecordPrepare
+    public interface IRecordPrepare
     {
-        string Id { get; }
-
-        bool Equals(object? obj);
+        void Prepare();        
     }
 }

@@ -25,9 +25,9 @@ namespace WatcherSdk.Records
 
         public bool Enabled { get; set; }
 
-        public TimeSpan? Frequency { get; set; } = TimeSpan.FromMinutes(5);
+        public int? FrequencyInSeconds { get; set; } = (int)TimeSpan.FromMinutes(5).TotalSeconds;
 
-        public override string ToString() => $"Id=Id, TargetType={TargetType}, Url={Url}";
+        public override string ToString() => $"Id={Id}, TargetType={TargetType}, Url={Url}";
 
         public override bool Equals(object? obj)
         {
@@ -35,11 +35,11 @@ namespace WatcherSdk.Records
                    Id.ToLowerInvariant() == record.Id.ToLowerInvariant() &&
                    Description == record.Description &&
                    Url == record.Url &&
-                   StatusCodeMaps.SequenceEqual(record.StatusCodeMaps) &&
-                   BodyElementMaps.SequenceEqual(record.BodyElementMaps) &&
+                   SequenceEqual(StatusCodeMaps, record.StatusCodeMaps) &&
+                   SequenceEqual(BodyElementMaps, record.BodyElementMaps) &&
                    TargetType == record.TargetType &&
                    Enabled == record.Enabled &&
-                   Frequency == record.Frequency;
+                   FrequencyInSeconds == record.FrequencyInSeconds;
         }
 
         public override int GetHashCode() => HashCode.Combine(Id, Description, Url, StatusCodeMaps, BodyElementMaps, TargetType, Enabled);
@@ -49,5 +49,11 @@ namespace WatcherSdk.Records
         public static bool operator ==(TargetRecord? left, TargetRecord? right) => EqualityComparer<TargetRecord>.Default.Equals(left!, right!);
 
         public static bool operator !=(TargetRecord? left, TargetRecord? right) => !(left == right);
+
+        private static bool SequenceEqual<T>(IEnumerable<T>? source, IEnumerable<T>? value)
+        {
+            if (source == null || value == null) return source == value;
+            return source.SequenceEqual(value);
+        }
     }
 }

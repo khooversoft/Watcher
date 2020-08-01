@@ -85,12 +85,14 @@ namespace WatcherCmd
                 var activities = new Func<Task>[]
                 {
                     () => option.Agent && option.Create ? container.GetRequiredService<AgentActivity>().Create(cancellationTokenSource.Token) : Task.CompletedTask,
+                    () => option.Agent && option.Get ? container.GetRequiredService<AgentActivity>().Get(cancellationTokenSource.Token) : Task.CompletedTask,
                     () => option.Agent && option.List ? container.GetRequiredService<AgentActivity>().List(cancellationTokenSource.Token) : Task.CompletedTask,
                     () => option.Agent && option.Delete ? container.GetRequiredService<AgentActivity>().Delete(cancellationTokenSource.Token) : Task.CompletedTask,
                     () => option.Agent && option.Clear ? container.GetRequiredService<AgentActivity>().Clear(cancellationTokenSource.Token) : Task.CompletedTask,
                     () => option.Agent && option.Template ? container.GetRequiredService<AgentActivity>().CreateTemplate(cancellationTokenSource.Token) : Task.CompletedTask,
 
                     () => option.Target && option.Create ? container.GetRequiredService<TargetActivity>().Create(cancellationTokenSource.Token) : Task.CompletedTask,
+                    () => option.Target && option.Get ? container.GetRequiredService<TargetActivity>().Get(cancellationTokenSource.Token) : Task.CompletedTask,
                     () => option.Target && option.List ? container.GetRequiredService<TargetActivity>().List(cancellationTokenSource.Token) : Task.CompletedTask,
                     () => option.Target && option.Delete ? container.GetRequiredService<TargetActivity>().Delete(cancellationTokenSource.Token) : Task.CompletedTask,
                     () => option.Target && option.Clear ? container.GetRequiredService<TargetActivity>().Clear(cancellationTokenSource.Token) : Task.CompletedTask,
@@ -98,8 +100,9 @@ namespace WatcherCmd
 
                     () => option.Assignment && option.Create ? container.GetRequiredService<AgentAssignmentActivity>().Create(cancellationTokenSource.Token) : Task.CompletedTask,
                     () => option.Assignment && option.List ? container.GetRequiredService<AgentAssignmentActivity>().List(cancellationTokenSource.Token) : Task.CompletedTask,
+                    () => option.Assignment && option.Get ? container.GetRequiredService<AgentAssignmentActivity>().Get(cancellationTokenSource.Token) : Task.CompletedTask,
                     () => option.Assignment && option.Delete ? container.GetRequiredService<AgentAssignmentActivity>().Delete(cancellationTokenSource.Token) : Task.CompletedTask,
-                    () => option.Assignment && option.Clear ? container.GetRequiredService<AgentAssignmentActivity>().CreateTemplate(cancellationTokenSource.Token) : Task.CompletedTask,
+                    () => option.Assignment && option.Clear ? container.GetRequiredService<AgentAssignmentActivity>().Clear(cancellationTokenSource.Token) : Task.CompletedTask,
                     () => option.Assignment && option.Template ? container.GetRequiredService<AgentAssignmentActivity>().CreateTemplate(cancellationTokenSource.Token) : Task.CompletedTask,
 
                     () => option.Balance ? container.GetRequiredService<BalanceActivity>().BalanceAgents(cancellationTokenSource.Token) : Task.CompletedTask,
@@ -133,17 +136,17 @@ namespace WatcherCmd
                 .AddSingleton<IRecordContainer<AgentRecord>>(services =>
                 {
                     IWatcherRepository watcherRepository = services.GetRequiredService<IWatcherRepository>();
-                    return watcherRepository.Container.Get<AgentRecord>(option.Store.DatabaseName);
+                    return watcherRepository.Container.Get<AgentRecord>();
                 })
                 .AddSingleton<IRecordContainer<TargetRecord>>(services =>
                 {
                     IWatcherRepository watcherRepository = services.GetRequiredService<IWatcherRepository>();
-                    return watcherRepository.Container.Get<TargetRecord>(option.Store.DatabaseName);
+                    return watcherRepository.Container.Get<TargetRecord>();
                 })
                 .AddSingleton<IRecordContainer<AgentAssignmentRecord>>(services =>
                 {
                     IWatcherRepository watcherRepository = services.GetRequiredService<IWatcherRepository>();
-                    return watcherRepository.Container.Get<AgentAssignmentRecord>(option.Store.DatabaseName);
+                    return watcherRepository.Container.Get<AgentAssignmentRecord>();
                 })
                 .AddSingleton<AgentActivity>()
                 .AddSingleton<TargetActivity>()
