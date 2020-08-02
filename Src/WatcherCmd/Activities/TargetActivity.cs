@@ -29,7 +29,7 @@ namespace WatcherCmd.Activities
             {
                 Id = "{targetId}",
                 Description = "{target description}",
-                Url = "{url of resource}",
+                ReadyUrl = "{url of resource}",
                 StatusCodeMaps = new StatusCodeMap[]
                 {
                     new StatusCodeMap { HttpStatusCode = HttpStatusCode.OK, State = TargetState.Ok },

@@ -11,8 +11,9 @@ using Toolbox.Extensions;
 using Toolbox.Tools;
 using System.Security.Cryptography.X509Certificates;
 using WatcherSdk.Models;
+using WatcherAgent.Application;
 
-namespace WatcherCmd.Application
+namespace WatcherAgent.Application
 {
     internal class OptionBuilder
     {

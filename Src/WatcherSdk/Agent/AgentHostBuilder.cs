@@ -48,7 +48,7 @@ namespace WatcherSdk.Agent
             return this;
         }
 
-        public AgentHostBuilder SetProbeFactory(ProbeFactory probeFactory)
+        public AgentHostBuilder SetProbeFactory(IProbeFactory probeFactory)
         {
             ProbeFactory = probeFactory;
             return this;

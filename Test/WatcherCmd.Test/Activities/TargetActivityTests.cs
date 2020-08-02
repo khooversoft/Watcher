@@ -21,7 +21,7 @@ namespace WatcherCmd.Test.Activities
         {
             Id = "Target_1",
             Description = "Target 1 record",
-            Url = "http://localhost:5010",
+            ReadyUrl = "http://localhost:5010",
             StatusCodeMaps = new[]
             {
                 new StatusCodeMap { HttpStatusCode = HttpStatusCode.OK, State = TargetState.Ok }
@@ -38,7 +38,7 @@ namespace WatcherCmd.Test.Activities
         {
             Id = $"Target_{x}",
             Description = $"Target {x} record",
-            Url = $"http://localhost:501{x}",
+            ReadyUrl = $"http://localhost:501{x}",
             StatusCodeMaps = new[]
             {
                 new StatusCodeMap { HttpStatusCode = HttpStatusCode.OK, State = TargetState.Ok }

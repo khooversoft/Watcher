@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using TestRestApiServer.Models;
 using TestRestApiServer.Services;
 using Toolbox.Extensions;
+using WatcherSdk.Services.ServiceState;
 
 namespace TestRestApiServer.Controllers
 {
@@ -35,44 +36,7 @@ namespace TestRestApiServer.Controllers
                 Status = _stateService.ServiceState.ToString()
             };
 
-            switch (_stateService.ServiceState)
-            {
-                case ServiceStateType.Stopped:
-                    return StatusCode((int)HttpStatusCode.ServiceUnavailable, result);
-
-                case ServiceStateType.Running:
-                case ServiceStateType.Ready:
-                    return Ok(result);
-
-                case ServiceStateType.Failed:
-                default:
-                    return StatusCode((int)HttpStatusCode.InternalServerError, result);
-            }
-        }
-
-        [HttpGet("running")]
-        public IActionResult GetRunning()
-        {
-            _logger.LogTrace($"{nameof(GetRunning)}: Ping running, current state: {_stateService.ServiceState}");
-
-            var result = new PingResultModel
-            {
-                Status = _stateService.ServiceState.ToString()
-            };
-
-            switch (_stateService.ServiceState)
-            {
-                case ServiceStateType.Stopped:
-                    return StatusCode((int)HttpStatusCode.ServiceUnavailable, result);
-
-                case ServiceStateType.Ready:
-                case ServiceStateType.Running:
-                    return Ok(result);
-
-                case ServiceStateType.Failed:
-                default:
-                    return StatusCode((int)HttpStatusCode.InternalServerError, result);
-            }
+            return StatusCode((int)_stateService.ServiceState.ToHttpStatusCodeForReady(), result);
         }
 
         [HttpGet("ready")]
@@ -85,19 +49,20 @@ namespace TestRestApiServer.Controllers
                 Status = _stateService.ServiceState.ToString()
             };
 
-            switch (_stateService.ServiceState)
+            return StatusCode((int)_stateService.ServiceState.ToHttpStatusCodeForReady(), result);
+        }
+
+        [HttpGet("running")]
+        public IActionResult GetRunning()
+        {
+            _logger.LogTrace($"{nameof(GetRunning)}: Ping running, current state: {_stateService.ServiceState}");
+
+            var result = new PingResultModel
             {
-                case ServiceStateType.Running:
-                case ServiceStateType.Stopped:
-                    return StatusCode((int)HttpStatusCode.ServiceUnavailable, result);
+                Status = _stateService.ServiceState.ToString()
+            };
 
-                case ServiceStateType.Ready:
-                    return Ok(result);
-
-                case ServiceStateType.Failed:
-                default:
-                    return StatusCode((int)HttpStatusCode.InternalServerError, result);
-            }
+            return StatusCode((int)_stateService.ServiceState.ToHttpStatusCodeForRunning(), result);
         }
 
         [HttpPost("state/{newState}")]

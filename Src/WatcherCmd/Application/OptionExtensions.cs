@@ -60,15 +60,5 @@ namespace WatcherCmd.Application
 
             return option;
         }
-
-        public static Option Bind(this IConfiguration configuration)
-        {
-            configuration.VerifyNotNull(nameof(configuration));
-
-            //var option = new Option();
-            var option = new Option();
-            configuration.Bind(option, x => x.BindNonPublicProperties = true);
-            return option;
-        }
     }
 }

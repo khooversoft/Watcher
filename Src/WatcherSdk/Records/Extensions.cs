@@ -15,7 +15,7 @@ namespace WatcherSdk.Records
             {
                 TargetId = targetRecord.Id,
                 AgentId = agentId,
-                Url = targetRecord.Url,
+                Url = targetRecord.ReadyUrl,
                 HttpStatusCode = httpStatusCode,
                 Body = body,
                 TargetState = Models.TargetState.Ok,
@@ -29,7 +29,7 @@ namespace WatcherSdk.Records
             {
                 TargetId = targetRecord.Id,
                 AgentId = agentId,
-                Url = targetRecord.Url,
+                Url = targetRecord.ReadyUrl,
                 HttpStatusCode = httpStatusCode,
                 Body = body,
                 TargetState = Models.TargetState.Error,

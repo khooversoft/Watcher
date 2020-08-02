@@ -25,7 +25,7 @@ namespace WatcherSdk.Agent
         public MonitoringJob(TargetRecord targetRecord, IProbe probe, ILogger<MonitoringJob> logger)
         {
             targetRecord.VerifyNotNull(nameof(targetRecord))
-                .VerifyAssert(x => !x.Url.IsEmpty(), x => nameof(x.Url))
+                .VerifyAssert(x => !x.ReadyUrl.IsEmpty(), x => nameof(x.ReadyUrl))
                 .VerifyAssert(x => x.FrequencyInSeconds != null, x => nameof(x.FrequencyInSeconds));
 
             probe.VerifyNotNull(nameof(probe));

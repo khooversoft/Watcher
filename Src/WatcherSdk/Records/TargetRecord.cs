@@ -15,7 +15,15 @@ namespace WatcherSdk.Records
 
         public string? Description { get; set; }
 
-        public string? Url { get; set; }
+        /// <summary>
+        /// Required URL to see if the service is ready for operations
+        /// </summary>
+        public string? ReadyUrl { get; set; }
+
+        /// <summary>
+        /// Optional URL to see if the service is running, "ready" returns 503
+        /// </summary>
+        public string? RunningUrl { get; set; }
 
         public IList<StatusCodeMap>? StatusCodeMaps { get; set; }
 
@@ -27,14 +35,15 @@ namespace WatcherSdk.Records
 
         public int? FrequencyInSeconds { get; set; } = (int)TimeSpan.FromMinutes(5).TotalSeconds;
 
-        public override string ToString() => $"Id={Id}, TargetType={TargetType}, Url={Url}";
+        public override string ToString() => $"Id={Id}, TargetType={TargetType}, ReadyUrl={ReadyUrl}, RunningUrl={RunningUrl}";
 
         public override bool Equals(object? obj)
         {
             return obj is TargetRecord record &&
                    Id.ToLowerInvariant() == record.Id.ToLowerInvariant() &&
                    Description == record.Description &&
-                   Url == record.Url &&
+                   ReadyUrl == record.ReadyUrl &&
+                   RunningUrl == record.RunningUrl &&
                    SequenceEqual(StatusCodeMaps, record.StatusCodeMaps) &&
                    SequenceEqual(BodyElementMaps, record.BodyElementMaps) &&
                    TargetType == record.TargetType &&
@@ -42,9 +51,15 @@ namespace WatcherSdk.Records
                    FrequencyInSeconds == record.FrequencyInSeconds;
         }
 
-        public override int GetHashCode() => HashCode.Combine(Id, Description, Url, StatusCodeMaps, BodyElementMaps, TargetType, Enabled);
+        public override int GetHashCode() => HashCode.Combine(Id, Description, ReadyUrl, StatusCodeMaps, BodyElementMaps, TargetType, Enabled);
 
-        public void Prepare() => Id = Id.VerifyNotEmpty(nameof(Id)).ToLowerInvariant();
+        public void Prepare()
+        {
+            Id.VerifyNotEmpty(nameof(Id));
+            ReadyUrl.VerifyNotEmpty(nameof(ReadyUrl));
+
+            Id = Id.VerifyNotEmpty(nameof(Id)).ToLowerInvariant();
+        }
 
         public static bool operator ==(TargetRecord? left, TargetRecord? right) => EqualityComparer<TargetRecord>.Default.Equals(left!, right!);
 

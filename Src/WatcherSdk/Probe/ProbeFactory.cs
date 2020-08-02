@@ -40,7 +40,7 @@ namespace WatcherSdk.Probe
             {
                 ProbeType.REST => new RestProbe(agentId!, targetRecord, _httpClientFactory.CreateClient(), traceContainer, _loggerFactory.CreateLogger<RestProbe>()),
 
-                _ => throw new InvalidOperationException("Unsupported target type (probe type)"),
+                _ => throw new InvalidOperationException($"Unsupported target type, probeType={probeTypeObj}"),
             };
         }
     }

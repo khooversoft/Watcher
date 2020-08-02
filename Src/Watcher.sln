@@ -9,8 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Toolbox", "Toolbox\Toolbox.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WatcherSdk", "WatcherSdk\WatcherSdk.csproj", "{6DE3E8E1-8670-49DE-A853-266938E44379}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WatcherAgent", "WatcherAgent\WatcherAgent.csproj", "{A809DF1B-2A31-4F55-AC6D-B868C44F3011}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Watcher.Cosmos.Repository", "Watcher.Cosmos.Repository\Watcher.Cosmos.Repository.csproj", "{451BBDEB-B8B5-46AE-8873-FEB7C9DDAFE4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WatcherCmd", "WatcherCmd\WatcherCmd.csproj", "{5A17FAAD-803A-4D1E-8804-D6CB19C10C57}"
@@ -30,7 +28,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WatcherCmd.Test", "..\Test\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{26168E2A-4A62-43D9-BB55-49680A3B11F3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestRestApiServer", "..\Test\TestRestApiServer\TestRestApiServer.csproj", "{E6B283CD-4862-4CE7-9752-DD3507968DB8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestRestApiServer", "..\Test\TestRestApiServer\TestRestApiServer.csproj", "{E6B283CD-4862-4CE7-9752-DD3507968DB8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WatcherAgent", "WatcherAgent\WatcherAgent.csproj", "{41C3D586-4EF4-45B5-BB77-15677FFEFC44}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,10 +50,6 @@ Global
 		{6DE3E8E1-8670-49DE-A853-266938E44379}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6DE3E8E1-8670-49DE-A853-266938E44379}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6DE3E8E1-8670-49DE-A853-266938E44379}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A809DF1B-2A31-4F55-AC6D-B868C44F3011}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A809DF1B-2A31-4F55-AC6D-B868C44F3011}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A809DF1B-2A31-4F55-AC6D-B868C44F3011}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A809DF1B-2A31-4F55-AC6D-B868C44F3011}.Release|Any CPU.Build.0 = Release|Any CPU
 		{451BBDEB-B8B5-46AE-8873-FEB7C9DDAFE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{451BBDEB-B8B5-46AE-8873-FEB7C9DDAFE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{451BBDEB-B8B5-46AE-8873-FEB7C9DDAFE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -78,6 +74,10 @@ Global
 		{E6B283CD-4862-4CE7-9752-DD3507968DB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E6B283CD-4862-4CE7-9752-DD3507968DB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E6B283CD-4862-4CE7-9752-DD3507968DB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{41C3D586-4EF4-45B5-BB77-15677FFEFC44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{41C3D586-4EF4-45B5-BB77-15677FFEFC44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{41C3D586-4EF4-45B5-BB77-15677FFEFC44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{41C3D586-4EF4-45B5-BB77-15677FFEFC44}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

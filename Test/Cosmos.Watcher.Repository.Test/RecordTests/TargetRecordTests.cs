@@ -161,7 +161,7 @@ namespace Cosmos.Watcher.Repository.Test.RecordTests
             {
                 Id = $"target.{index}",
                 Description = "Target description",
-                Url = "http://localhost:3003/predict",
+                ReadyUrl = "http://localhost:3003/predict",
                 StatusCodeMaps = new List<StatusCodeMap>
                 {
                     new StatusCodeMap { HttpStatusCode = HttpStatusCode.OK, State = TargetState.Ok},
