@@ -1,18 +1,14 @@
 ﻿using Microsoft.Extensions.Logging;
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Threading;
 using Toolbox.Extensions;
 using Toolbox.Tools;
 using WatcherSdk.Probe;
 using WatcherSdk.Records;
 using WatcherSdk.Repository;
 
-namespace WatcherSdk.Agent
+namespace WatcherSdk.Host
 {
     public class AgentHostBuilder
     {

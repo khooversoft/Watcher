@@ -13,7 +13,7 @@ using Toolbox.Tools;
 using Toolbox.Tools.Rest;
 using WatcherSdk.Records;
 using WatcherSdk.Repository;
-using WatcherSdk.Services.ServiceState;
+using WatcherSdk.Services.State;
 
 namespace WatcherSdk.Probe
 {

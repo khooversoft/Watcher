@@ -11,13 +11,15 @@ namespace WatcherSdk.Repository
 {
     public static class Extensions
     {
-        public static Task<IReadOnlyList<AgentAssignmentRecord>> GetAssignmentsForAgent(this IRecordContainer<AgentAssignmentRecord> container, string agentId, ILogger logger, CancellationToken token)
+        public static Task<IReadOnlyList<TargetRecord>> GetAssignments(this IRecordContainer<TargetRecord> container, string agentId, ILogger logger, CancellationToken token = default)
         {
-            agentId.VerifyNotEmpty(nameof(agentId));
+            agentId = agentId
+                .VerifyNotEmpty(nameof(agentId))
+                .ToLowerInvariant();
 
-            string search = $"select * from ROOT where AgentId = \"{agentId}\"";
+            string search = $"select * from ROOT where AssignedAgentId = \"{agentId}\"";
 
-            logger.LogInformation($"{nameof(GetAssignmentsForAgent)}: Searching for agent assignments, search={search}");
+            logger.LogInformation($"{nameof(GetAssignments)}: Searching for agent assignments, search={search}");
             return container.Search(search, token);
         }
     }

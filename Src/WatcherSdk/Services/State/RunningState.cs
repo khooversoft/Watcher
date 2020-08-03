@@ -1,9 +1,9 @@
 ﻿using System.Net;
 using System.Runtime.CompilerServices;
 
-namespace WatcherSdk.Services.ServiceState
+namespace WatcherSdk.Services.State
 {
-    public enum ServiceStateType
+    public enum RunningState
     {
         Stopped,
         Running,
@@ -13,22 +13,22 @@ namespace WatcherSdk.Services.ServiceState
 
     public static class ServiceStateTypeExtensions
     {
-        public static HttpStatusCode ToHttpStatusCodeForReady(this ServiceStateType subject) => subject switch
+        public static HttpStatusCode ToHttpStatusCodeForReady(this RunningState subject) => subject switch
         {
-            ServiceStateType.Running => HttpStatusCode.ServiceUnavailable,
-            ServiceStateType.Stopped => HttpStatusCode.ServiceUnavailable,
+            RunningState.Running => HttpStatusCode.ServiceUnavailable,
+            RunningState.Stopped => HttpStatusCode.ServiceUnavailable,
 
-            ServiceStateType.Ready => HttpStatusCode.OK,
+            RunningState.Ready => HttpStatusCode.OK,
 
             _ => HttpStatusCode.InternalServerError,
         };
 
-        public static HttpStatusCode ToHttpStatusCodeForRunning(this ServiceStateType subject) => subject switch
+        public static HttpStatusCode ToHttpStatusCodeForRunning(this RunningState subject) => subject switch
         {
-            ServiceStateType.Stopped => HttpStatusCode.ServiceUnavailable,
+            RunningState.Stopped => HttpStatusCode.ServiceUnavailable,
 
-            ServiceStateType.Running => HttpStatusCode.OK,
-            ServiceStateType.Ready => HttpStatusCode.OK,
+            RunningState.Running => HttpStatusCode.OK,
+            RunningState.Ready => HttpStatusCode.OK,
 
             _ => HttpStatusCode.InternalServerError,
         };

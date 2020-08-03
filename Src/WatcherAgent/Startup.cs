@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using WatcherAgent.Services.AgentAssignment;
-using WatcherAgent.Services.Work;
-using WatcherSdk.Services.ServiceState;
+using Watcher.Cosmos.Repository;
+using WatcherAgent.Services;
+using WatcherSdk.Records;
+using WatcherSdk.Repository;
+using WatcherSdk.Services.State;
 
 namespace WatcherAgent
 {
@@ -23,10 +25,24 @@ namespace WatcherAgent
         {
             services.AddControllers();
 
-            services.AddSingleton<IStateService, StateService>();
-            services.AddSingleton<IWorkQueueService, WorkQueueService>();
-            services.AddSingleton<IAgentAssignmentService, AgentAssignmentService>();
-            services.AddSingleton<IWorkQueueService, WorkQueueService>();
+            services.AddSingleton<IRunningStateService, RunningStateService>();
+            services.AddSingleton<IWatcherRepository, CosmosWatcherRepository>();
+            services.AddSingleton<IAgentController, AgentController>();
+
+            services.AddSingleton<IRecordContainer<AgentRecord>>(services =>
+            {
+                IWatcherRepository watcherRepository = services.GetRequiredService<IWatcherRepository>();
+                return watcherRepository.Container.Get<AgentRecord>();
+            });
+
+            services.AddSingleton<IRecordContainer<TargetRecord>>(services =>
+            {
+                IWatcherRepository watcherRepository = services.GetRequiredService<IWatcherRepository>();
+                return watcherRepository.Container.Get<TargetRecord>();
+            });
+
+            services.AddHostedService<JobHost>();
+            services.AddHttpClient();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

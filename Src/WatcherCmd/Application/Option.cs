@@ -17,7 +17,6 @@ namespace WatcherCmd.Application
 
         public bool Agent { get; set; }
         public bool Target { get; set; }
-        public bool Assignment { get; set; }
         public bool Balance { get; set; }
 
         public bool Create { get; set; }

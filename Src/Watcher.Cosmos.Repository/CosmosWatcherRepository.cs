@@ -39,14 +39,13 @@ namespace Watcher.Cosmos.Repository
 
         public IRepositoryContainer Container { get; }
 
-        public async Task InitializeEnvironment(CancellationToken token = default)
+        public async Task InitializeContainers(CancellationToken token = default)
         {
-            _logger.LogInformation($"{nameof(InitializeEnvironment)} - Initializing database with required containers");
+            _logger.LogInformation($"{nameof(InitializeContainers)} - Initializing database with required containers");
 
             await Database.Create(_watcherOption.DatabaseName, token);
 
             await Container.Create<AgentRecord>(token: token);
-            await Container.Create<AgentAssignmentRecord>(token: token);
             await Container.Create<TargetRecord>(token: token);
             await Container.Create<TraceRecord>(_watcherOption.TraceTraceTTL, token: token);
         }

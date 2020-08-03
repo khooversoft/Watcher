@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Toolbox.Extensions;
 using Toolbox.Tools;
 using WatcherSdk.Models;
 
@@ -35,7 +36,9 @@ namespace WatcherSdk.Records
 
         public int? FrequencyInSeconds { get; set; } = (int)TimeSpan.FromMinutes(5).TotalSeconds;
 
-        public override string ToString() => $"Id={Id}, TargetType={TargetType}, ReadyUrl={ReadyUrl}, RunningUrl={RunningUrl}";
+        public string? AssignedAgentId { get; set; }
+
+        public override string ToString() => $"Id={Id}, TargetType={TargetType}, ReadyUrl={ReadyUrl}, RunningUrl={RunningUrl}, AssignedAgentId={AssignedAgentId}";
 
         public override bool Equals(object? obj)
         {
@@ -48,17 +51,22 @@ namespace WatcherSdk.Records
                    SequenceEqual(BodyElementMaps, record.BodyElementMaps) &&
                    TargetType == record.TargetType &&
                    Enabled == record.Enabled &&
-                   FrequencyInSeconds == record.FrequencyInSeconds;
+                   FrequencyInSeconds == record.FrequencyInSeconds &&
+                   AssignedAgentId == record.AssignedAgentId;
         }
 
-        public override int GetHashCode() => HashCode.Combine(Id, Description, ReadyUrl, StatusCodeMaps, BodyElementMaps, TargetType, Enabled);
+        public override int GetHashCode() => HashCode.Combine(Id);
 
         public void Prepare()
         {
             Id.VerifyNotEmpty(nameof(Id));
             ReadyUrl.VerifyNotEmpty(nameof(ReadyUrl));
 
-            Id = Id.VerifyNotEmpty(nameof(Id)).ToLowerInvariant();
+            Id = Id.ToLowerInvariant();
+
+            AssignedAgentId = AssignedAgentId
+                .ToNullIfEmpty()
+                ?.ToLowerInvariant();
         }
 
         public static bool operator ==(TargetRecord? left, TargetRecord? right) => EqualityComparer<TargetRecord>.Default.Equals(left!, right!);

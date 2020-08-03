@@ -5,14 +5,23 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Toolbox.Extensions;
+using Toolbox.Tools;
 
 namespace Toolbox.Logging
 {
     public static class LoggerExtensions
     {
-        public static ILoggingBuilder AddLogFile(this ILoggingBuilder builder, string loggingFolder, string baseLogFileName, int limit = 10)
+        public static ILoggingBuilder AddFileLogger(this ILoggingBuilder builder, string loggingFolder, string baseLogFileName, int limit = 10)
         {
             builder.AddProvider(new FileLoggerProvider(loggingFolder, baseLogFileName, limit));
+            return builder;
+        }
+
+        public static ILoggingBuilder AddMemoryLogger(this ILoggingBuilder builder, BoundedQueue<string> queue)
+        {
+            builder.AddProvider(new MemoryLoggerProvider(queue));
+            builder.AddFilter<MemoryLoggerProvider>(x => true);
+
             return builder;
         }
 

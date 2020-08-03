@@ -15,10 +15,10 @@ namespace WatcherCmd.Application
 {
     internal static class OptionExtensions
     {
-        private static void IsCommand(Option option) => new[] { option.Agent, option.Target, option.Assignment, option.Balance }
+        private static void IsCommand(Option option) => new[] { option.Agent, option.Target, option.Balance }
                 .Where(x => x == true)
                 .Count()
-                .VerifyAssert(x => x == 1, "Must specify one of the following commands: Agent, Target, Assignment, Balance, or Help");
+                .VerifyAssert(x => x == 1, "Must specify one of the following commands: Agent, Target, Balance, or Help");
 
         private static void IsOperation(Option option) => new[] { option.Create, option.Get, option.List, option.Delete, option.Clear, option.Template }
                 .Where(x => x == true)
@@ -40,10 +40,7 @@ namespace WatcherCmd.Application
             IsCommand(option);
             TestStore(option);
 
-            if (option.Create || option.Template || option.Assignment)
-            {
-                IsOperation(option);
-            }
+            if (option.Create || option.Template) IsOperation(option);
 
             if (option.Get || option.Template) option.File.VerifyNotEmpty("Get or Template requires File={file}");
 

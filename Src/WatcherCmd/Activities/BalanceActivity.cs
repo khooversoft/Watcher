@@ -7,20 +7,18 @@ using WatcherSdk.Repository;
 using Toolbox.Tools;
 using System.Threading.Tasks;
 using System.Threading;
+using Watcher.Cosmos.Repository;
 
 namespace WatcherCmd.Activities
 {
     internal class BalanceActivity
     {
-        private readonly IOption _option;
         private readonly IAgentController _agentController;
 
-        public BalanceActivity(IOption option, IAgentController agentController)
+        public BalanceActivity(IAgentController agentController)
         {
-            option.VerifyNotNull(nameof(option));
             agentController.VerifyNotNull(nameof(agentController));
 
-            _option = option;
             _agentController = agentController;
         }
 

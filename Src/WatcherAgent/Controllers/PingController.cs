@@ -9,7 +9,7 @@ using Toolbox.Tools;
 using Toolbox.Extensions;
 using WatcherAgent.Models;
 using System.Net;
-using WatcherAgent.Services.AgentStatus;
+using WatcherSdk.Services.State;
 
 namespace WatcherAgent.Controllers
 {
@@ -17,10 +17,10 @@ namespace WatcherAgent.Controllers
     [ApiController]
     internal class PingController : ControllerBase
     {
-        private readonly IAgentStatusService _stateService;
+        private readonly IRunningStateService _stateService;
         private readonly ILogger<PingController> _logger;
 
-        public PingController(IAgentStatusService stateService, ILogger<PingController> logger)
+        public PingController(IRunningStateService stateService, ILogger<PingController> logger)
         {
             _stateService = stateService;
             _logger = logger;
@@ -38,14 +38,14 @@ namespace WatcherAgent.Controllers
 
             switch (_stateService.ServiceState)
             {
-                case ServiceStatusState.Stopped:
+                case RunningState.Stopped:
                     return StatusCode((int)HttpStatusCode.ServiceUnavailable, result);
 
-                case ServiceStatusState.Running:
-                case ServiceStatusState.Ready:
+                case RunningState.Running:
+                case RunningState.Ready:
                     return Ok(result);
 
-                case ServiceStatusState.Failed:
+                case RunningState.Failed:
                 default:
                     return StatusCode((int)HttpStatusCode.InternalServerError, result);
             }
@@ -63,14 +63,14 @@ namespace WatcherAgent.Controllers
 
             switch (_stateService.ServiceState)
             {
-                case ServiceStatusState.Stopped:
+                case RunningState.Stopped:
                     return StatusCode((int)HttpStatusCode.ServiceUnavailable, result);
 
-                case ServiceStatusState.Ready:
-                case ServiceStatusState.Running:
+                case RunningState.Ready:
+                case RunningState.Running:
                     return Ok(result);
 
-                case ServiceStatusState.Failed:
+                case RunningState.Failed:
                 default:
                     return StatusCode((int)HttpStatusCode.InternalServerError, result);
             }
@@ -88,14 +88,14 @@ namespace WatcherAgent.Controllers
 
             switch (_stateService.ServiceState)
             {
-                case ServiceStatusState.Running:
-                case ServiceStatusState.Stopped:
+                case RunningState.Running:
+                case RunningState.Stopped:
                     return StatusCode((int)HttpStatusCode.ServiceUnavailable, result);
 
-                case ServiceStatusState.Ready:
+                case RunningState.Ready:
                     return Ok(result);
 
-                case ServiceStatusState.Failed:
+                case RunningState.Failed:
                 default:
                     return StatusCode((int)HttpStatusCode.InternalServerError, result);
             }

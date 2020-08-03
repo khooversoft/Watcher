@@ -7,7 +7,6 @@ namespace WatcherCmd.Application
     internal interface IOption
     {
         bool Agent { get; set; }
-        bool Assignment { get; set; }
         bool Balance { get; set; }
         bool Clear { get; set; }
         string? ConfigFile { get; set; }

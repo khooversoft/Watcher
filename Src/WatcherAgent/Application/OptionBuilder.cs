@@ -89,13 +89,7 @@ namespace WatcherAgent.Application
                 break;
             };
 
-            if (!option.Store?.AccountKey.IsEmpty() == false)
-            {
-                option.SecretFilter = new SecretFilter(new[] { option.Store?.AccountKey! });
-            }
-
             option.Verify();
-
             return option;
 
             static string createAccountKeyCommand(string value) => $"{nameof(option.Store)}:{nameof(option.Store.AccountKey)}=" + value.VerifyNotEmpty(nameof(value));

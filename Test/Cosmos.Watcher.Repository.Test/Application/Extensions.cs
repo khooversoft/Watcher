@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Watcher.Cosmos.Repository;
 using WatcherSdk.Models;
 using WatcherSdk.Records;
 using WatcherSdk.Repository;

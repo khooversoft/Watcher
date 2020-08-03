@@ -22,7 +22,6 @@ namespace Watcher.Cosmos.Repository
         private readonly IWatcherRepository _watcherRepository;
         private readonly ILogger<AgentController> _logger;
         private readonly IRecordContainer<AgentRecord> _agentContainer;
-        private readonly IRecordContainer<AgentAssignmentRecord> _agentAssignmentContainer;
         private readonly IRecordContainer<TargetRecord> _targetContainer;
 
         public AgentController(ICosmosWatcherOption option, IWatcherRepository watcherRepository, ILogger<AgentController> logger)
@@ -36,14 +35,13 @@ namespace Watcher.Cosmos.Repository
             _logger = logger;
 
             _agentContainer = _watcherRepository.Container.Get<AgentRecord>();
-            _agentAssignmentContainer = _watcherRepository.Container.Get<AgentAssignmentRecord>();
             _targetContainer = _watcherRepository.Container.Get<TargetRecord>();
         }
 
         public async Task Register(AgentRecord agentRecord, CancellationToken token = default)
         {
             agentRecord.VerifyNotNull(nameof(agentRecord));
-            _logger.LogTrace($"{nameof(Register)}: Agent id {agentRecord.Id}, state={agentRecord.State}");
+            _logger.LogTrace($"{nameof(Register)}: agentId={agentRecord.Id}, state={agentRecord.State}");
 
             await _agentContainer.Set(agentRecord, token: token);
         }
@@ -51,23 +49,23 @@ namespace Watcher.Cosmos.Repository
         public async Task UnRegister(string agentName, CancellationToken token = default)
         {
             agentName.VerifyNotEmpty(nameof(agentName)).ToLowerInvariant();
-            _logger.LogTrace($"{nameof(UnRegister)}: Agent id {agentName}");
+            _logger.LogTrace($"{nameof(UnRegister)}: agentId={agentName}");
 
             await _agentContainer.Delete(agentName, token: token);
 
             _logger.LogTrace($"{nameof(UnRegister)}: Remove assignments for agent id {agentName}");
-            IReadOnlyList<AgentAssignmentRecord> assignments = await _agentAssignmentContainer.Search($"select * from ROOT r where r.AgentId = \"{agentName}\"");
+            IReadOnlyList<TargetRecord> agentAssignments = await _targetContainer.GetAssignments(agentName, _logger, token);
 
-            foreach (var item in assignments)
+            foreach (var item in agentAssignments)
             {
-                await _agentAssignmentContainer.Delete(item.Id);
+                await _targetContainer.Delete(item.Id);
             }
         }
 
         public async Task<bool> SetState(string agentName, AgentState agentState, CancellationToken token = default)
         {
             agentName.VerifyNotEmpty(nameof(agentName));
-            _logger.LogTrace($"{nameof(SetState)}: Agent id {agentName}, state={agentState}");
+            _logger.LogTrace($"{nameof(SetState)}: agentId={agentName}, state={agentState}");
 
             Record<AgentRecord>? agentRecord = await _agentContainer.Get(agentName, token: token);
             if (agentRecord == null) return false;
@@ -75,18 +73,6 @@ namespace Watcher.Cosmos.Repository
             agentRecord.Value.State = agentState;
             await _agentContainer.Set(agentRecord);
             return true;
-        }
-
-        public async Task<IReadOnlyList<TargetRecord>> GetAssignments(string agentName, CancellationToken token = default)
-        {
-            var assignedTargets = (await _agentAssignmentContainer.ListAll(token))
-                .Where(x => x.AgentId == agentName)
-                .Join(await GetActiveTargets(token), x => x.TargetId, x => x.Id, (o, i) => i)
-                .ToArray();
-
-            _logger.LogTrace($"{nameof(GetAssignments)}: Agent {agentName} is assigned {string.Join(", ", assignedTargets.Select(x => x.Id))}");
-
-            return assignedTargets;
         }
 
         /// <summary>
@@ -118,20 +104,19 @@ namespace Watcher.Cosmos.Repository
             if (activeAgents.Count == 0) return;
 
             IReadOnlyList<TargetRecord> activeTargets = await GetActiveTargets(token);
-            IDictionary<string, AgentAssignmentRecord> activeAssignments = (await _agentAssignmentContainer.ListAll(token)).ToDictionary(x => x.Id);
 
             // Remove assignments and refresh
-            _logger.LogTrace($"{nameof(GetAssignments)}: Delete assignments where not assigned to active agents");
-            RemoveAssignmentsWhereNotAssignedToAgent(activeAssignments, activeAgents);
+            _logger.LogTrace($"{nameof(LoadBalanceAssignments)}: Delete assignments where not assigned to active agents");
+            RemoveAssignmentInvalidAgentAssignment(activeTargets, activeAgents);
 
             // Re-balance if required if assignment counts are out of tolerance
-            RebalanceIfRequired(activeTargets, activeAgents, activeAssignments);
+            RebalanceIfRequired(activeTargets, activeAgents);
 
             // Assign un-assigned targets to agents
-            AssignTargetsToAgents(activeTargets, activeAgents, activeAssignments);
+            AssignTargetsToAgents(activeTargets, activeAgents);
 
             // Update the DB with assignment delta
-            await UpdateAssignments(activeAssignments, token);
+            await UpdateAssignments(activeTargets, token);
         }
 
         private async Task<IReadOnlyList<AgentRecord>> GetActiveAgents(CancellationToken token) =>
@@ -144,35 +129,36 @@ namespace Watcher.Cosmos.Repository
                 .Where(x => x.Enabled)
                 .ToArray();
 
-        private void RemoveAssignmentsWhereNotAssignedToAgent(IDictionary<string, AgentAssignmentRecord> activeAssignment, IReadOnlyList<AgentRecord> agentRecords) => activeAssignment.Values
-               .Where(x => !agentRecords.Any(y => y.Id == x.AgentId))
-               .ToArray()
-               .ForEach(x => activeAssignment.Remove(x.Id));
+        private void RemoveAssignmentInvalidAgentAssignment(IEnumerable<TargetRecord> activeTargets, IEnumerable<AgentRecord> agentRecords) => activeTargets
+               .Where(x => !agentRecords.Any(y => y.Id == x.AssignedAgentId))
+               .ForEach(x => x.AssignedAgentId = null);
 
-        private int AgentAssignmentCount(AgentRecord agentRecord, IDictionary<string, AgentAssignmentRecord> activeAssignment) => activeAssignment.Values.Count(x => x.AgentId == agentRecord.Id);
+        private int AgentAssignmentCount(AgentRecord agentRecord, IReadOnlyList<TargetRecord> activeAssignment) => activeAssignment.Count(x => x.AssignedAgentId == agentRecord.Id);
 
-        private void RebalanceIfRequired(IReadOnlyList<TargetRecord> activeTargets, IReadOnlyList<AgentRecord> activeAgents, IDictionary<string, AgentAssignmentRecord> activeAssignment)
+        private void RebalanceIfRequired(IReadOnlyList<TargetRecord> activeTargets, IReadOnlyList<AgentRecord> activeAgents)
         {
             _logger.LogTrace($"{nameof(RebalanceIfRequired)}: Check");
 
             int agentGoal = Math.Max(activeTargets.Count / activeAgents.Count, 1);
 
             bool overLimit = activeAgents
-                .Select(x => AgentAssignmentCount(x, activeAssignment))
+                .Select(x => AgentAssignmentCount(x, activeTargets))
                 .Any(x => agentGoal - x > (int)(agentGoal * .8));
 
             if (!overLimit) return;
 
-            _logger.LogInformation($"{nameof(RebalanceIfRequired)}: Rebalancing assignments");
-            activeAssignment.Clear();
+            _logger.LogInformation($"{nameof(RebalanceIfRequired)}: Forcing re-balance");
+
+            activeTargets
+                .ForEach(x => x.AssignedAgentId = null);
         }
 
-        private void AssignTargetsToAgents(IReadOnlyList<TargetRecord> activeTargets, IReadOnlyList<AgentRecord> activeAgents, IDictionary<string, AgentAssignmentRecord> activeAssignment)
+        private void AssignTargetsToAgents(IReadOnlyList<TargetRecord> activeTargets, IReadOnlyList<AgentRecord> activeAgents)
         {
             _logger.LogTrace($"{nameof(AssignTargetsToAgents)}: Assign un-assigned targets to agents");
 
             var newTargets = activeTargets
-                .Where(x => !activeAssignment.Values.Any(y => x.Id == y.TargetId))
+                .Where(x => x.AssignedAgentId == null)
                 .ToArray();
 
             var newTargetsQueue = new Queue<TargetRecord>(newTargets);
@@ -180,42 +166,24 @@ namespace Watcher.Cosmos.Repository
             while (newTargetsQueue.TryDequeue(out TargetRecord targetRecord))
             {
                 AgentRecord agent = activeAgents
-                    .Select(x => (Agent: x, Count: AgentAssignmentCount(x, activeAssignment)))
+                    .Select(x => (Agent: x, Count: AgentAssignmentCount(x, activeTargets)))
                     .OrderBy(x => x.Count)
                     .Select(x => x.Agent)
                     .First();
 
-                var newAssignment = new AgentAssignmentRecord(agent.Id, targetRecord.Id);
-
-                if (!activeAssignment.ContainsKey(newAssignment.Id))
-                {
-                    activeAssignment.Add(newAssignment.Id, newAssignment);
-                }
+                targetRecord.AssignedAgentId = agent.Id;
             }
         }
 
-        private async Task UpdateAssignments(IDictionary<string, AgentAssignmentRecord> activeAssignments, CancellationToken token)
+        private Task UpdateAssignments(IReadOnlyList<TargetRecord> activeTargets, CancellationToken token)
         {
             _logger.LogTrace($"{nameof(UpdateAssignments)}: Update assignments based on load balancing work");
-            IReadOnlyList<AgentAssignmentRecord> currentList = await _agentAssignmentContainer.ListAll(token);
 
-            // Delete assignments that are in current list but not in active assignments
-            foreach (AgentAssignmentRecord record in currentList)
-            {
-                if (!activeAssignments.ContainsKey(record.Id))
-                {
-                    await _agentAssignmentContainer.Delete(record.Id);
-                }
-            }
+            Task[] tasks = activeTargets
+                .Select(x => _targetContainer.Set(x, token))
+                .ToArray();
 
-            // Add assignments that are not in current list
-            foreach (AgentAssignmentRecord record in activeAssignments.Values)
-            {
-                if (!currentList.Any(x => record.Id == x.Id))
-                {
-                    await _agentAssignmentContainer.Set(record, token: token);
-                }
-            }
+            return Task.WhenAll(tasks);
         }
     }
 }

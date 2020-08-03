@@ -1,26 +1,19 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Toolbox.Extensions;
 using Toolbox.Tools;
 using WatcherSdk.Probe;
 using WatcherSdk.Records;
-using WatcherSdk.Repository;
 
-namespace WatcherSdk.Agent
+namespace WatcherSdk.Host
 {
     public class MonitoringJob : IMonitoringJob
     {
         private readonly TargetRecord _targetRecord;
         private readonly IProbe _probe;
         private readonly ILogger<MonitoringJob> _logger;
-        private readonly Random _random = new Random();
-        private CancellationTokenSource? _cancellation;
 
         public MonitoringJob(TargetRecord targetRecord, IProbe probe, ILogger<MonitoringJob> logger)
         {
@@ -36,27 +29,32 @@ namespace WatcherSdk.Agent
             _logger = logger;
         }
 
-        public Task Start(CancellationToken token)
+        public Task Run(CancellationToken token)
         {
             var tcs = new TaskCompletionSource<bool>();
 
-            _cancellation = CancellationTokenSource.CreateLinkedTokenSource(token);
-            _logger.LogInformation($"{nameof(Start)}: Target={_targetRecord}");
+            _logger.LogInformation($"{nameof(Run)}: Target={_targetRecord}");
 
             _ = Task.Run(async () =>
             {
-                TimeSpan delay = TimeSpan.FromSeconds(_random.Next(10, 30));
-                await Task.Delay(delay);
-
-                while (!token.IsCancellationRequested)
+                try
                 {
-                    _logger.LogInformation($"{nameof(Start)}: Pinging target={_targetRecord}");
-                    await _probe.Ping(token);
+                    while (!token.IsCancellationRequested)
+                    {
+                        _logger.LogInformation($"{nameof(Run)}: Pinging target={_targetRecord}");
+                        await _probe.Ping(token);
 
-                    await Task.Delay(TimeSpan.FromSeconds((double)_targetRecord.FrequencyInSeconds!));
+                        await Task.Delay(TimeSpan.FromSeconds((double)_targetRecord.FrequencyInSeconds!), token);
+                    }
+
+                    tcs.SetResult(true);
                 }
-
-                tcs.SetResult(true);
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, $"Monitoring (ping) failed, Target={_targetRecord}");
+                    tcs.SetException(ex);
+                    return;
+                }
             });
 
             return tcs.Task;

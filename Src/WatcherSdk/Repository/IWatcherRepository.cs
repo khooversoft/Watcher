@@ -8,6 +8,6 @@ namespace WatcherSdk.Repository
         IRepositoryContainer Container { get; }
         IRepositoryDatabase Database { get; }
 
-        Task InitializeEnvironment(CancellationToken token = default);
+        Task InitializeContainers(CancellationToken token = default);
     }
 }

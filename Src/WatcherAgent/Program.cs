@@ -11,6 +11,7 @@ using WatcherAgent.Application;
 using Toolbox.Extensions;
 using Toolbox.Tools;
 using Toolbox.Logging;
+using Watcher.Cosmos.Repository.Application;
 
 namespace WatcherAgent
 {
@@ -23,20 +24,24 @@ namespace WatcherAgent
                 .SetConfigFile("appsettings.json")
                 .Build();
 
-            CreateHostBuilder(args, option)
+            CreateHostBuilder(args, option, new BoundedQueue<string>(1000))
                 .Build()
                 .Run();
         }
 
-        internal static IHostBuilder CreateHostBuilder(string[] args, IOption option) =>
+        internal static IHostBuilder CreateHostBuilder(string[] args, IOption option, BoundedQueue<string> queue) =>
             Host.CreateDefaultBuilder(args)
                  .ConfigureServices(service =>
                  {
                      service.AddSingleton<IOption>(option);
+                     service.AddSingleton<ICosmosWatcherOption>(option.Store);
+                     service.AddSingleton<BoundedQueue<string>>(queue);
                  })
                 .ConfigureLogging(builder =>
                 {
-                    if (!option.LogFolder?.IsEmpty() == true) builder.AddLogFile(option.LogFolder!, "WatcherAgent");
+                    builder.AddMemoryLogger(queue);
+
+                    if (!option.LogFolder?.IsEmpty() == true) builder.AddFileLogger(option.LogFolder!, "WatcherAgent");
                 })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {

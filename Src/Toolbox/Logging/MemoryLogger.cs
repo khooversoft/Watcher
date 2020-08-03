@@ -2,7 +2,9 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
+using Toolbox.Tools;
 
 namespace Toolbox.Logging
 {
@@ -11,17 +13,16 @@ namespace Toolbox.Logging
     /// </summary>
     public class MemoryLogger : ILogger
     {
-        private readonly int _maxSize = 100;
-        private readonly ConcurrentQueue<string> _queue = new ConcurrentQueue<string>();
+        private readonly BoundedQueue<string> _boundedQueue;
 
         /// <summary>
         /// Construct with max size or default
         /// </summary>
         /// <param name="maxSize"></param>
-        public MemoryLogger(string name, int maxSize = 100)
+        public MemoryLogger(string name, BoundedQueue<string> boundedQueue)
         {
             Name = name;
-            _maxSize = maxSize;
+            _boundedQueue = boundedQueue;
         }
 
         public IDisposable BeginScope<TState>(TState state) => null!;
@@ -30,28 +31,20 @@ namespace Toolbox.Logging
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
-            _queue.Enqueue($"{Name}: " + formatter(state, exception));
-
-            while (_queue.Count > _maxSize) _queue.TryDequeue(out string _);
+            _boundedQueue.Enqueue($"{Name}: " + formatter(state, exception));
         }
-
-        public IReadOnlyList<string> LoggedItems => _queue.ToArray();
 
         /// <summary>
         /// Name of logger
         /// </summary>
         public string Name { get; }
+    }
 
-        /// <summary>
-        /// Create a type logger for memory
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public static ILogger<T> CreateLogger<T>() => new MemoryLoggerStub<T>();
-
-        private class MemoryLoggerStub<T> : MemoryLogger, ILogger<T>
+    public class MemoryLogger<T> : MemoryLogger, ILogger<T>
+    {
+        public MemoryLogger(string name, BoundedQueue<string> boundedQueue)
+            : base(name, boundedQueue)
         {
-            public MemoryLoggerStub() : base(typeof(T).Name) { }
         }
     }
 }

@@ -25,6 +25,8 @@ namespace WatcherAgent.Application
 
         public CosmosWatcherOption Store { get; set; } = null!;
 
+        public TimeSpan StoreSyncFrequency { get; set; } = TimeSpan.FromMinutes(5);
+
         public KeyVaultOption? KeyVault { get; set; }
 
         public string GetServiceUrl() => Resolve(ServiceUri);

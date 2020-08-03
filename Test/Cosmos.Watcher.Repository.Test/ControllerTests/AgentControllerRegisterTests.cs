@@ -29,7 +29,7 @@ namespace Cosmos.Watcher.Repository.Test.ControllerTests
             // Arrange
             IWatcherRepository watcherRepository = new CosmosWatcherRepository(_watcherOption, _loggerFactory);
             await watcherRepository.Database.Delete(_databaseName);
-            await watcherRepository.InitializeEnvironment();
+            await watcherRepository.InitializeContainers();
 
             IRecordContainer<AgentRecord> agentContainer = await watcherRepository.Container.Create<AgentRecord>();
             agentContainer.Should().NotBeNull();
@@ -70,7 +70,7 @@ namespace Cosmos.Watcher.Repository.Test.ControllerTests
             // Arrange
             IWatcherRepository watcherRepository = new CosmosWatcherRepository(_watcherOption, _loggerFactory);
             await watcherRepository.Database.Delete(_databaseName);
-            await watcherRepository.InitializeEnvironment();
+            await watcherRepository.InitializeContainers();
 
             IRecordContainer<AgentRecord> container = await watcherRepository.Container.Create<AgentRecord>();
             container.Should().NotBeNull();

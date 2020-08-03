@@ -98,13 +98,6 @@ namespace WatcherCmd
                     () => option.Target && option.Clear ? container.GetRequiredService<TargetActivity>().Clear(cancellationTokenSource.Token) : Task.CompletedTask,
                     () => option.Target && option.Template ? container.GetRequiredService<TargetActivity>().CreateTemplate(cancellationTokenSource.Token) : Task.CompletedTask,
 
-                    () => option.Assignment && option.Create ? container.GetRequiredService<AgentAssignmentActivity>().Create(cancellationTokenSource.Token) : Task.CompletedTask,
-                    () => option.Assignment && option.List ? container.GetRequiredService<AgentAssignmentActivity>().List(cancellationTokenSource.Token) : Task.CompletedTask,
-                    () => option.Assignment && option.Get ? container.GetRequiredService<AgentAssignmentActivity>().Get(cancellationTokenSource.Token) : Task.CompletedTask,
-                    () => option.Assignment && option.Delete ? container.GetRequiredService<AgentAssignmentActivity>().Delete(cancellationTokenSource.Token) : Task.CompletedTask,
-                    () => option.Assignment && option.Clear ? container.GetRequiredService<AgentAssignmentActivity>().Clear(cancellationTokenSource.Token) : Task.CompletedTask,
-                    () => option.Assignment && option.Template ? container.GetRequiredService<AgentAssignmentActivity>().CreateTemplate(cancellationTokenSource.Token) : Task.CompletedTask,
-
                     () => option.Balance ? container.GetRequiredService<BalanceActivity>().BalanceAgents(cancellationTokenSource.Token) : Task.CompletedTask,
                 };
 
@@ -127,7 +120,7 @@ namespace WatcherCmd
                         .AddConsole()
                         .AddDebug();
 
-                    if (!option.LogFolder.IsEmpty()) config.AddLogFile(option.LogFolder!, "WatcherCmd");
+                    if (!option.LogFolder.IsEmpty()) config.AddFileLogger(option.LogFolder!, "WatcherCmd");
                 })
                 .AddSingleton(option)
                 .AddSingleton<ICosmosWatcherOption>(option.Store)
@@ -143,15 +136,9 @@ namespace WatcherCmd
                     IWatcherRepository watcherRepository = services.GetRequiredService<IWatcherRepository>();
                     return watcherRepository.Container.Get<TargetRecord>();
                 })
-                .AddSingleton<IRecordContainer<AgentAssignmentRecord>>(services =>
-                {
-                    IWatcherRepository watcherRepository = services.GetRequiredService<IWatcherRepository>();
-                    return watcherRepository.Container.Get<AgentAssignmentRecord>();
-                })
                 .AddSingleton<AgentActivity>()
                 .AddSingleton<TargetActivity>()
                 .AddSingleton<BalanceActivity>()
-                .AddSingleton<AgentAssignmentActivity>()
                 .AddSingleton<IJson, Json>()
                 .BuildServiceProvider();
 
@@ -163,7 +150,7 @@ namespace WatcherCmd
             Console.WriteLine("Initializing Cosmos Database");
 
             IWatcherRepository watcherRepository = container.GetRequiredService<IWatcherRepository>();
-            await watcherRepository.InitializeEnvironment(token);
+            await watcherRepository.InitializeContainers(token);
         }
     }
 }

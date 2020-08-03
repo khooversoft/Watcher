@@ -16,7 +16,9 @@ namespace WatcherSdk.Records
 
         public DateTime UtcHeartbeat { get; set; } = DateTime.UtcNow;
 
-        public void Prepare() => Id = Id.VerifyNotEmpty(nameof(Id)).ToLowerInvariant();
+        public void Prepare() => Id = Id
+            .VerifyNotEmpty(nameof(Id))
+            .ToLowerInvariant();
 
         public override bool Equals(object? obj)
         {

@@ -48,7 +48,7 @@ namespace WatcherAgent.Application
                 .Prepend(string.Empty)
                 .Append(string.Empty)
                 .Append(string.Empty)
-                .ForEach(x => Console.WriteLine(option.SecretFilter?.FilterSecrets(x) ?? x));
+                .ForEach(x => Console.WriteLine(x));
         }
     }
 }

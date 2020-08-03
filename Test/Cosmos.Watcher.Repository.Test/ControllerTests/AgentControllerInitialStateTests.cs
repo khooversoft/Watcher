@@ -29,17 +29,20 @@ namespace Cosmos.Watcher.Repository.Test.ControllerTests
             // Arrange
             IWatcherRepository watcherRepository = new CosmosWatcherRepository(_watcherOption, _loggerFactory);
             await watcherRepository.Database.Delete(_databaseName);
-            await watcherRepository.InitializeEnvironment();
+            await watcherRepository.InitializeContainers();
 
-            IRecordContainer<AgentRecord> container = await watcherRepository.Container.Create<AgentRecord>();
-            container.Should().NotBeNull();
+            IRecordContainer<AgentRecord> agentContainer = await watcherRepository.Container.Create<AgentRecord>();
+            agentContainer.Should().NotBeNull();
+
+            IRecordContainer<TargetRecord> targetContainer = await watcherRepository.Container.Create<TargetRecord>();
+            targetContainer.Should().NotBeNull();
 
             IAgentController agentController = new AgentController(_watcherOption, watcherRepository, _loggerFactory.CreateLogger<AgentController>());
             agentController.Should().NotBeNull();
 
             // Act
             await agentController.LoadBalanceAssignments();
-            IReadOnlyList<TargetRecord> targetRecords = await agentController.GetAssignments(_fakeAgentText);
+            IReadOnlyList<TargetRecord> targetRecords = await targetContainer.GetAssignments(_fakeAgentText, _loggerFactory.CreateLogger<TargetRecord>());
 
             // Assert
             targetRecords.Should().NotBeNull();
@@ -55,15 +58,19 @@ namespace Cosmos.Watcher.Repository.Test.ControllerTests
             // Arrange
             IWatcherRepository watcherRepository = new CosmosWatcherRepository(_watcherOption, _loggerFactory);
             await watcherRepository.Database.Delete(_databaseName);
-            await watcherRepository.InitializeEnvironment();
+            await watcherRepository.InitializeContainers();
 
             IAgentController agentController = new AgentController(_watcherOption, watcherRepository, _loggerFactory.CreateLogger<AgentController>());
             agentController.Should().NotBeNull();
             AgentRecord agentRecord = await agentController.CreateTestAgent(1);
 
+            IRecordContainer<TargetRecord> targetContainer = await watcherRepository.Container.Create<TargetRecord>();
+            targetContainer.Should().NotBeNull();
+
+
             // Act
             await agentController.LoadBalanceAssignments();
-            IReadOnlyList<TargetRecord> targetRecords = await agentController.GetAssignments(agentRecord.Id);
+            IReadOnlyList<TargetRecord> targetRecords = await targetContainer.GetAssignments(agentRecord.Id, _loggerFactory.CreateLogger<TargetRecord>());
 
             // Assert
             targetRecords.Should().NotBeNull();
@@ -79,7 +86,7 @@ namespace Cosmos.Watcher.Repository.Test.ControllerTests
             // Arrange
             IWatcherRepository watcherRepository = new CosmosWatcherRepository(_watcherOption, _loggerFactory);
             await watcherRepository.Database.Delete(_databaseName);
-            await watcherRepository.InitializeEnvironment();
+            await watcherRepository.InitializeContainers();
 
             IRecordContainer<TargetRecord> targetContainer = await watcherRepository.Container.Create<TargetRecord>();
             targetContainer.Should().NotBeNull();
@@ -90,7 +97,7 @@ namespace Cosmos.Watcher.Repository.Test.ControllerTests
 
             // Act
             await agentController.LoadBalanceAssignments();
-            IReadOnlyList<TargetRecord> targetRecords = await agentController.GetAssignments(_fakeAgentText);
+            IReadOnlyList<TargetRecord> targetRecords = await targetContainer.GetAssignments(_fakeAgentText, _loggerFactory.CreateLogger<TargetRecord>());
 
             // Assert
             targetRecords.Should().NotBeNull();

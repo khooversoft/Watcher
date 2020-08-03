@@ -1,10 +1,10 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace WatcherSdk.Agent
+namespace WatcherSdk.Host
 {
     public interface IMonitoringJob
     {
-        Task Start(CancellationToken token);
+        Task Run(CancellationToken token);
     }
 }

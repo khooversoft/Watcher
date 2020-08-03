@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
 using TestRestApiServer.Models;
-using TestRestApiServer.Services;
 using Toolbox.Extensions;
-using WatcherSdk.Services.ServiceState;
+using WatcherSdk.Services.State;
 
 namespace TestRestApiServer.Controllers
 {
@@ -17,10 +11,10 @@ namespace TestRestApiServer.Controllers
     [ApiController]
     public class PingController : ControllerBase
     {
-        private readonly IStateService _stateService;
+        private readonly IRunningStateService _stateService;
         private readonly ILogger<PingController> _logger;
 
-        public PingController(IStateService stateService, ILogger<PingController> logger)
+        public PingController(IRunningStateService stateService, ILogger<PingController> logger)
         {
             _stateService = stateService;
             _logger = logger;
@@ -69,9 +63,9 @@ namespace TestRestApiServer.Controllers
         public IActionResult SetState(string newState)
         {
             if (newState.IsEmpty()) return BadRequest();
-            if (!Enum.TryParse(typeof(ServiceStateType), newState, true, out object? newStateTypeObject)) return BadRequest();
+            if (!Enum.TryParse(typeof(RunningState), newState, true, out object? newStateTypeObject)) return BadRequest();
 
-            ServiceStateType newStateType = (ServiceStateType)newStateTypeObject!;
+            RunningState newStateType = (RunningState)newStateTypeObject!;
 
             _logger.LogTrace($"{nameof(SetState)}: current state={_stateService.ServiceState}, new state={newStateType}");
             _stateService.SetState(newStateType);
