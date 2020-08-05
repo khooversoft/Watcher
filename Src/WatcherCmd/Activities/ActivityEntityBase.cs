@@ -37,14 +37,6 @@ namespace WatcherCmd.Activities
             _entityName = entityName;
         }
 
-        public async Task Create(CancellationToken token)
-        {
-            _logger.LogInformation($"{nameof(Create)}: Reading file {_option.File} and writing to store");
-            T record = _option.File!.ReadAndDeserialize<T>(_json);
-
-            await _recordContainer.Set(record, token);
-        }
-
         public async Task Get(CancellationToken token)
         {
             _logger.LogInformation($"{nameof(Get)}: Getting ID={_option.Id} and writing to file={_option.File}");
@@ -68,7 +60,7 @@ namespace WatcherCmd.Activities
 
         public async Task Delete(CancellationToken token)
         {
-            _logger.LogInformation($"{nameof(Create)}: Deleting ID={_option.Id}");
+            _logger.LogInformation($"{nameof(Delete)}: Deleting ID={_option.Id}");
             await _recordContainer.Delete(_option.Id!, token: token);
         }
 
@@ -82,7 +74,5 @@ namespace WatcherCmd.Activities
                 await _recordContainer.Delete(item.Id);
             }
         }
-
-        public abstract Task CreateTemplate(CancellationToken token);
     }
 }

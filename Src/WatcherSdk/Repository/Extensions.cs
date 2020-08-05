@@ -17,7 +17,7 @@ namespace WatcherSdk.Repository
                 .VerifyNotEmpty(nameof(agentId))
                 .ToLowerInvariant();
 
-            string search = $"select * from ROOT where AssignedAgentId = \"{agentId}\"";
+            string search = $"select * from ROOT r where r.AssignedAgentId = \"{agentId}\"";
 
             logger.LogInformation($"{nameof(GetAssignments)}: Searching for agent assignments, search={search}");
             return container.Search(search, token);

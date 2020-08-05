@@ -37,4 +37,8 @@
     <ProjectReference Include="..\..\Src\WatcherSdk\WatcherSdk.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="TestData\Entities\" />
+  </ItemGroup>
+
 </Project>

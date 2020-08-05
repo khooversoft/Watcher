@@ -24,6 +24,10 @@ namespace WatcherAgent.Services
         private readonly ILogger<JobHost> _logger;
         private IAgentHost? _agentHost;
         private TimerAsync? _timerAsync;
+        private int _syncFlag;
+
+        private const int _syncFree = 0;
+        private const int _syncLocked = 1;
 
         public JobHost(
             IOption option,
@@ -70,19 +74,31 @@ namespace WatcherAgent.Services
 
         public async Task SyncAssignments(CancellationToken token)
         {
-            _logger.LogInformation($"{nameof(SyncAssignments)}: Syncing assignments");
-            await StopAgentHost();
+            int syncFlag = Interlocked.CompareExchange(ref _syncFlag, _syncLocked, _syncFree);
+            if (syncFlag == _syncLocked) return;
 
-            _logger.LogInformation($"{nameof(SyncAssignments)}: Starting Job Host");
-            IReadOnlyList<TargetRecord> currentAssigned = await _targetContainer.GetAssignments(_option.AgentId, _logger, token);
+            try
+            {
+                _logger.LogInformation($"{nameof(SyncAssignments)}: Syncing assignments");
+                await StopAgentHost();
 
-            _agentHost = new AgentHostBuilder()
-                .SetAgentId(_option.AgentId)
-                .SetTraceContainer(_traceRecord)
-                .SetProbeFactory(new ProbeFactory(_httpClientFactory, _loggerFactory))
-                .SetLoggerFactory(_loggerFactory)
-                .AddTarget(currentAssigned.ToArray())
-                .Build();
+                _logger.LogInformation($"{nameof(SyncAssignments)}: Starting Job Host");
+                IReadOnlyList<TargetRecord> currentAssigned = await _targetContainer.GetAssignments(_option.AgentId, _logger, token);
+
+                _agentHost = new AgentHostBuilder()
+                    .SetAgentId(_option.AgentId)
+                    .SetTraceContainer(_traceRecord)
+                    .SetProbeFactory(new ProbeFactory(_httpClientFactory, _loggerFactory))
+                    .SetLoggerFactory(_loggerFactory)
+                    .AddTarget(currentAssigned.ToArray())
+                    .Build();
+
+                await _agentHost.Start(token);
+            }
+            finally
+            {
+                _syncFlag = _syncFree;
+            }
         }
 
         private async Task StopAgentHost()

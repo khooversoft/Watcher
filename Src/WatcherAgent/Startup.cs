@@ -28,6 +28,7 @@ namespace WatcherAgent
             services.AddSingleton<IRunningStateService, RunningStateService>();
             services.AddSingleton<IWatcherRepository, CosmosWatcherRepository>();
             services.AddSingleton<IAgentController, AgentController>();
+            services.AddSingleton<JobHost>();
 
             services.AddSingleton<IRecordContainer<AgentRecord>>(services =>
             {
@@ -39,6 +40,12 @@ namespace WatcherAgent
             {
                 IWatcherRepository watcherRepository = services.GetRequiredService<IWatcherRepository>();
                 return watcherRepository.Container.Get<TargetRecord>();
+            });
+
+            services.AddSingleton<IRecordContainer<TraceRecord>>(services =>
+            {
+                IWatcherRepository watcherRepository = services.GetRequiredService<IWatcherRepository>();
+                return watcherRepository.Container.Get<TraceRecord>();
             });
 
             services.AddHostedService<JobHost>();

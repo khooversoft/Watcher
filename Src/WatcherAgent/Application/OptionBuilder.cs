@@ -21,17 +21,9 @@ namespace WatcherAgent.Application
 
         public string[]? Args { get; set; }
 
-        public string? ConfigFile { get; set; }
-
         public OptionBuilder SetArgs(params string[] args)
         {
             Args = args.ToArray();
-            return this;
-        }
-
-        public OptionBuilder SetConfigFile(string configFile)
-        {
-            ConfigFile = configFile;
             return this;
         }
 
@@ -76,7 +68,7 @@ namespace WatcherAgent.Application
                         configFile = v.ConfigFile;
                         continue;
 
-                    case Option v when v.Store?.AccountKey == null && v.SecretId.ToNullIfEmpty() != null && secretId == null:
+                    case Option v when v.SecretId.ToNullIfEmpty() != null && secretId == null:
                         secretId = v.SecretId;
                         continue;
 

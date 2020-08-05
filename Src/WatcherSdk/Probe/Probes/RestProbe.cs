@@ -15,7 +15,7 @@ using WatcherSdk.Records;
 using WatcherSdk.Repository;
 using WatcherSdk.Services.State;
 
-namespace WatcherSdk.Probe
+namespace WatcherSdk.Probe.Probes
 {
     public class RestProbe : IProbe
     {
@@ -86,7 +86,9 @@ namespace WatcherSdk.Probe
             string? body = await message.Content.ReadAsStringAsync();
 
             _logger.LogInformation($"{nameof(Ping)}: {_targetRecord}, StatusCode={message.StatusCode}, ms={ms}");
+
             var trace = _targetRecord.CreateOkTrace(_agentId, message.StatusCode, body, ms);
+            await _traceContainer.Set(trace);
 
             return testState(message.StatusCode);
         }

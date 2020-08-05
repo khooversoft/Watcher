@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Text;
+using WatcherSdk.Models;
 using WatcherSdk.Repository;
 
 namespace WatcherSdk.Records
@@ -18,7 +19,7 @@ namespace WatcherSdk.Records
                 Url = targetRecord.ReadyUrl,
                 HttpStatusCode = httpStatusCode,
                 Body = body,
-                TargetState = Models.TargetState.Ok,
+                TargetState = TargetState.Ok,
                 ProbeMs = ms,
             };
         }
@@ -32,7 +33,7 @@ namespace WatcherSdk.Records
                 Url = targetRecord.ReadyUrl,
                 HttpStatusCode = httpStatusCode,
                 Body = body,
-                TargetState = Models.TargetState.Error,
+                TargetState = TargetState.Error,
                 Exception = ex,
             };
         }

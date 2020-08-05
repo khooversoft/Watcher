@@ -7,8 +7,10 @@ using WatcherSdk.Models;
 
 namespace WatcherSdk.Records
 {
-    public class AgentRecord : IRecord
+    public class AgentRecord : RecordBase, IRecord
     {
+        public AgentRecord() : base(nameof(AgentRecord)) { }
+
         [JsonProperty("id")]
         public string Id { get; set; } = null!;
 

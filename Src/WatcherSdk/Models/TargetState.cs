@@ -6,7 +6,7 @@ namespace WatcherSdk.Models
 {
     public enum TargetState
     {
-        Ok,
-        Error
+        Ok = 0,
+        Error = 1,
     }
 }

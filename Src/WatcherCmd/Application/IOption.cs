@@ -10,7 +10,7 @@ namespace WatcherCmd.Application
         bool Balance { get; set; }
         bool Clear { get; set; }
         string? ConfigFile { get; set; }
-        bool Create { get; set; }
+        bool Import { get; set; }
         bool Delete { get; set; }
         string? File { get; set; }
         bool Get { get; set; }

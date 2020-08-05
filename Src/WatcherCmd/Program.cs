@@ -73,7 +73,7 @@ namespace WatcherCmd
             using (ServiceProvider serviceProvider = CreateContainer(option))
             {
                 IServiceProvider container = serviceProvider;
-                await InitializeRepository(container, cancellationTokenSource.Token);
+                await InitializeRepository(option, container, cancellationTokenSource.Token);
 
                 Console.CancelKeyPress += (object sender, ConsoleCancelEventArgs e) =>
                 {
@@ -84,20 +84,18 @@ namespace WatcherCmd
 
                 var activities = new Func<Task>[]
                 {
-                    () => option.Agent && option.Create ? container.GetRequiredService<AgentActivity>().Create(cancellationTokenSource.Token) : Task.CompletedTask,
                     () => option.Agent && option.Get ? container.GetRequiredService<AgentActivity>().Get(cancellationTokenSource.Token) : Task.CompletedTask,
                     () => option.Agent && option.List ? container.GetRequiredService<AgentActivity>().List(cancellationTokenSource.Token) : Task.CompletedTask,
                     () => option.Agent && option.Delete ? container.GetRequiredService<AgentActivity>().Delete(cancellationTokenSource.Token) : Task.CompletedTask,
                     () => option.Agent && option.Clear ? container.GetRequiredService<AgentActivity>().Clear(cancellationTokenSource.Token) : Task.CompletedTask,
-                    () => option.Agent && option.Template ? container.GetRequiredService<AgentActivity>().CreateTemplate(cancellationTokenSource.Token) : Task.CompletedTask,
 
-                    () => option.Target && option.Create ? container.GetRequiredService<TargetActivity>().Create(cancellationTokenSource.Token) : Task.CompletedTask,
                     () => option.Target && option.Get ? container.GetRequiredService<TargetActivity>().Get(cancellationTokenSource.Token) : Task.CompletedTask,
                     () => option.Target && option.List ? container.GetRequiredService<TargetActivity>().List(cancellationTokenSource.Token) : Task.CompletedTask,
                     () => option.Target && option.Delete ? container.GetRequiredService<TargetActivity>().Delete(cancellationTokenSource.Token) : Task.CompletedTask,
                     () => option.Target && option.Clear ? container.GetRequiredService<TargetActivity>().Clear(cancellationTokenSource.Token) : Task.CompletedTask,
-                    () => option.Target && option.Template ? container.GetRequiredService<TargetActivity>().CreateTemplate(cancellationTokenSource.Token) : Task.CompletedTask,
 
+                    () => option.Template ? container.GetRequiredService<TemplateActivity>().Create() : Task.CompletedTask,
+                    () => option.Import ? container.GetRequiredService<ImportActivity>().Import(cancellationTokenSource.Token) : Task.CompletedTask,
                     () => option.Balance ? container.GetRequiredService<BalanceActivity>().BalanceAgents(cancellationTokenSource.Token) : Task.CompletedTask,
                 };
 
@@ -112,41 +110,54 @@ namespace WatcherCmd
 
         private ServiceProvider CreateContainer(IOption option)
         {
-            ServiceProvider container = new ServiceCollection()
-                .AddHttpClient()
-                .AddLogging(config =>
-                {
-                    config
-                        .AddConsole()
-                        .AddDebug();
+            var container = new ServiceCollection();
 
-                    if (!option.LogFolder.IsEmpty()) config.AddFileLogger(option.LogFolder!, "WatcherCmd");
-                })
-                .AddSingleton(option)
-                .AddSingleton<ICosmosWatcherOption>(option.Store)
-                .AddSingleton<IWatcherRepository, CosmosWatcherRepository>()
-                .AddSingleton<IAgentController, AgentController>()
-                .AddSingleton<IRecordContainer<AgentRecord>>(services =>
+            container.AddHttpClient();
+
+            container.AddLogging(config =>
+            {
+                config
+                    .AddConsole()
+                    .AddDebug();
+
+                if (!option.LogFolder.IsEmpty()) config.AddFileLogger(option.LogFolder!, "WatcherCmd");
+            });
+
+            container.AddSingleton(option);
+            container.AddSingleton<IJson, Json>();
+            container.AddSingleton<TemplateActivity>();
+
+            if (option.Store != null)
+            {
+                container.AddSingleton<ICosmosWatcherOption>(option.Store);
+                container.AddSingleton<IWatcherRepository, CosmosWatcherRepository>();
+                container.AddSingleton<IAgentController, AgentController>();
+
+                container.AddSingleton<IRecordContainer<AgentRecord>>(services =>
                 {
                     IWatcherRepository watcherRepository = services.GetRequiredService<IWatcherRepository>();
                     return watcherRepository.Container.Get<AgentRecord>();
-                })
-                .AddSingleton<IRecordContainer<TargetRecord>>(services =>
+                });
+
+                container.AddSingleton<IRecordContainer<TargetRecord>>(services =>
                 {
                     IWatcherRepository watcherRepository = services.GetRequiredService<IWatcherRepository>();
                     return watcherRepository.Container.Get<TargetRecord>();
-                })
-                .AddSingleton<AgentActivity>()
-                .AddSingleton<TargetActivity>()
-                .AddSingleton<BalanceActivity>()
-                .AddSingleton<IJson, Json>()
-                .BuildServiceProvider();
+                });
 
-            return container;
+                container.AddSingleton<AgentActivity>();
+                container.AddSingleton<TargetActivity>();
+                container.AddSingleton<BalanceActivity>();
+                container.AddSingleton<ImportActivity>();
+            }
+
+            return container.BuildServiceProvider();
         }
 
-        private async Task InitializeRepository(IServiceProvider container, CancellationToken token)
+        private async Task InitializeRepository(IOption option, IServiceProvider container, CancellationToken token)
         {
+            if (option.Store == null) return;
+
             Console.WriteLine("Initializing Cosmos Database");
 
             IWatcherRepository watcherRepository = container.GetRequiredService<IWatcherRepository>();

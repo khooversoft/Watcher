@@ -9,6 +9,6 @@ namespace TestRestApiServer.Application
     {
         public bool Help { get; set; }
         public string? ConfigFile { get; set; }
-        public int Port { get; set; } = 5001;
+        public int Port { get; set; } = 5010;
     }
 }

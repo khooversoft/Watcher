@@ -49,13 +49,28 @@ namespace WatcherCmd.Test
         }
 
         [Fact]
-        public void GivenCreateAgentWithoutFile_ShouldThrow()
+        public void GivenImportWithFile_ShouldNotThrow()
         {
             Action act = () => new OptionBuilder()
                 .SetArgs(new[]
                 {
-                    "Agent",
-                    "Create",
+                    "Import",
+                    "File={File}",
+                }
+                .Concat(_storeArguments)
+                .ToArray())
+                .Build();
+
+            act.Should().Throw<ArgumentException>();
+        }
+
+        [Fact]
+        public void GivenImportWithoutFile_ShouldThrow()
+        {
+            Action act = () => new OptionBuilder()
+                .SetArgs(new[]
+                {
+                    "Import",
                 }
                 .Concat(_storeArguments)
                 .ToArray())
@@ -65,12 +80,8 @@ namespace WatcherCmd.Test
         }
 
         [Theory]
-        [InlineData("Agent", "Create")]
         [InlineData("Agent", "Template")]
-        [InlineData("Target", "Create")]
         [InlineData("Target", "Template")]
-        [InlineData("Assignment", "Create")]
-        [InlineData("Assignment", "Template")]
         public void GivenCommandThatRequireFile_ShouldNotThrow(string command, string action)
         {
             string file = Path.GetTempFileName();
@@ -102,7 +113,6 @@ namespace WatcherCmd.Test
         [Theory]
         [InlineData("Agent", "Delete")]
         [InlineData("Target", "Delete")]
-        [InlineData("Assignment", "Delete")]
         public void GivenCommandThatRequireID_ShouldNotThrow(string command, string action)
         {
             IOption option = new OptionBuilder()

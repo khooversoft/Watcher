@@ -15,16 +15,16 @@ namespace WatcherCmd.Application
         public string? ConfigFile { get; set; }
         public string? LogFolder { get; set; }
 
-        public bool Agent { get; set; }
-        public bool Target { get; set; }
-        public bool Balance { get; set; }
-
-        public bool Create { get; set; }
         public bool Get { get; set; }
         public bool List { get; set; }
         public bool Delete { get; set; }
         public bool Clear { get; set; }
         public bool Template { get; set; }
+        public bool Balance { get; set; }
+        public bool Import { get; set; }
+
+        public bool Agent { get; set; }
+        public bool Target { get; set; }
 
         public string? SecretId { get; set; }
 

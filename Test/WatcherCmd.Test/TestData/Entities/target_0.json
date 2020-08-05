@@ -1,0 +1,33 @@
+{
+    "id": "Target_0",
+    "description": "Target_0 description",
+    "readyUrl": "http://localhost:5010/ping/ready",
+    "runningUrl": "http://localhost:5010/ping/running",
+    "statusCodeMaps": [
+        {
+            "httpStatusCode": 200,
+            "state": 0
+        },
+        {
+            "httpStatusCode": 404,
+            "state": 1
+        }
+    ],
+    "bodyElementMaps": [
+        {
+            "path": "/state",
+            "compareTo": "success",
+            "state": 0
+        },
+        {
+            "path": "/state",
+            "compareTo": "error",
+            "state": 1
+        }
+    ],
+    "targetType": "REST",
+    "enabled": true,
+    "frequencyInSeconds": 20,
+    "assignedAgentId": "agent_0",
+    "recordType": "TargetRecord"
+}

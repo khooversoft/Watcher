@@ -75,7 +75,7 @@ namespace WatcherCmd.Application
                         configFile = v.ConfigFile;
                         continue;
 
-                    case Option v when v.Store?.AccountKey == null && v.SecretId.ToNullIfEmpty() != null && secretId == null:
+                    case Option v when v.SecretId.ToNullIfEmpty() != null && secretId == null:
                         secretId = v.SecretId;
                         continue;
 

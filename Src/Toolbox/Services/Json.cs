@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using Toolbox.Extensions;
 
 namespace Toolbox.Services
 {
@@ -14,11 +16,22 @@ namespace Toolbox.Services
         {
             PropertyNameCaseInsensitive = true,
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        };
+        }
+        .Action(x => x.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)));
+
+        private static readonly JsonSerializerOptions _formatOption = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            WriteIndented = true,
+        }
+        .Action(x => x.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)));
 
         public static Json Default { get; } = new Json();
 
         public string Serialize<T>(T subject) => JsonSerializer.Serialize(subject, _options);
+
+        public string SerializeFormat<T>(T subject) => JsonSerializer.Serialize(subject, _formatOption);
 
         public T Deserialize<T>(string subject) => JsonSerializer.Deserialize<T>(subject, _options);
     }

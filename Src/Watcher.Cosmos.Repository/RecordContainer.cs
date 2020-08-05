@@ -133,24 +133,32 @@ namespace Watcher.Cosmos.Repository
         {
             sqlQuery.VerifyNotEmpty(nameof(sqlQuery));
 
-            var list = new List<T>();
-
-            _logger.LogTrace($"{nameof(Search)}: Query={sqlQuery}");
-            var queryDefinition = new QueryDefinition(sqlQuery);
-
-            using FeedIterator<T> feedIterator = _container.GetItemQueryIterator<T>(queryDefinition);
-
-            while (feedIterator.HasMoreResults)
+            try
             {
-                foreach (T item in await feedIterator.ReadNextAsync())
+                var list = new List<T>();
+
+                _logger.LogTrace($"{nameof(Search)}: Query={sqlQuery}");
+                var queryDefinition = new QueryDefinition(sqlQuery);
+
+                using FeedIterator<T> feedIterator = _container.GetItemQueryIterator<T>(queryDefinition);
+
+                while (feedIterator.HasMoreResults)
                 {
-                    list.Add(item);
+                    foreach (T item in await feedIterator.ReadNextAsync())
+                    {
+                        list.Add(item);
+                    }
                 }
+
+                _logger.LogTrace($"{nameof(Search)}: Query={sqlQuery}, RecordCount={list.Count}");
+
+                return list;
             }
-
-            _logger.LogTrace($"{nameof(Search)}: Query={sqlQuery}, RecordCount={list.Count}");
-
-            return list;
+            catch(Exception ex)
+            {
+                _logger.LogWarning($"{nameof(Search)}: Error {ex.Message} for {sqlQuery}");
+                return Array.Empty<T>();
+            }
         }
 
         private bool IsValid(HttpStatusCode httpStatusCode) => _validStatusCode.Contains((int)httpStatusCode);

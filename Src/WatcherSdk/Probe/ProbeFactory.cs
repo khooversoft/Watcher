@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Net.Http;
 using System.Text;
 using Toolbox.Tools;
+using WatcherSdk.Probe.Probes;
 using WatcherSdk.Records;
 using WatcherSdk.Repository;
 

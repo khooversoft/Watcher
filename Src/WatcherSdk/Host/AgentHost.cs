@@ -9,19 +9,17 @@ namespace WatcherSdk.Host
 {
     public class AgentHost : IAgentHost
     {
-        private readonly IEnumerable<IMonitoringJob> _monitoringJobs;
+        private readonly IReadOnlyList<IMonitoringJob> _monitoringJobs;
         private readonly ILogger<AgentHost> _logger;
         private CancellationTokenSource? _cancellation;
         private Task? _runningTasks;
 
         public AgentHost(IEnumerable<IMonitoringJob> monitorJobs, ILogger<AgentHost> logger)
         {
-            monitorJobs
-                .VerifyNotNull(nameof(monitorJobs))
-                .VerifyAssert(x => x.Count() > 0, $"No jobs");
+            monitorJobs.VerifyNotNull(nameof(monitorJobs));
 
             logger.VerifyNotNull(nameof(logger));
-            _monitoringJobs = monitorJobs;
+            _monitoringJobs = monitorJobs.ToArray();
             _logger = logger;
         }
 

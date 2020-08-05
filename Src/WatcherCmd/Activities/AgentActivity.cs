@@ -23,20 +23,5 @@ namespace WatcherCmd.Activities
             : base(option, recordContainer, json, logger, "Agent")
         {
         }
-
-        public override Task CreateTemplate(CancellationToken token)
-        {
-            var record = new AgentRecord
-            {
-                Id = "{agentId}",
-                State = AgentState.Running,
-                UtcHeartbeat = DateTime.UtcNow,
-            };
-
-            File.WriteAllText(_option.File, _json.Serialize(record));
-            _logger.LogInformation($"Create json template {_option.File} for Agent");
-
-            return Task.CompletedTask;
-        }
     }
 }

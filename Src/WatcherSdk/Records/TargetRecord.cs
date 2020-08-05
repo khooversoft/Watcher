@@ -9,8 +9,10 @@ using WatcherSdk.Models;
 
 namespace WatcherSdk.Records
 {
-    public class TargetRecord : IRecord
+    public class TargetRecord : RecordBase, IRecord
     {
+        public TargetRecord() : base(nameof(TargetRecord)) { }
+
         [JsonProperty("id")]
         public string Id { get; set; } = null!;
 

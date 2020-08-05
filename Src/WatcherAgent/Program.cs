@@ -20,13 +20,20 @@ namespace WatcherAgent
         public static void Main(string[] args)
         {
             IOption option = new OptionBuilder()
-                .SetArgs(args)
-                .SetConfigFile("appsettings.json")
+                .SetArgs(args.Concat(new[]
+                {
+                    "SecretId=WatcherCmd",
+                    "ConfigFile=appsettings.json",
+                }).ToArray())
                 .Build();
 
-            CreateHostBuilder(args, option, new BoundedQueue<string>(1000))
-                .Build()
-                .Run();
+            try
+            {
+                CreateHostBuilder(args, option, new BoundedQueue<string>(1000))
+                    .Build()
+                    .Run();
+            }
+            catch (OperationCanceledException) { }
         }
 
         internal static IHostBuilder CreateHostBuilder(string[] args, IOption option, BoundedQueue<string> queue) =>
@@ -34,8 +41,9 @@ namespace WatcherAgent
                  .ConfigureServices(service =>
                  {
                      service.AddSingleton<IOption>(option);
-                     service.AddSingleton<ICosmosWatcherOption>(option.Store);
                      service.AddSingleton<BoundedQueue<string>>(queue);
+
+                     if (option.Store != null) service.AddSingleton<ICosmosWatcherOption>(option.Store);
                  })
                 .ConfigureLogging(builder =>
                 {

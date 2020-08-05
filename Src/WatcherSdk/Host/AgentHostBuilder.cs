@@ -34,7 +34,7 @@ namespace WatcherSdk.Host
 
         public AgentHostBuilder AddTarget(params TargetRecord[] targetRecords)
         {
-            Targets.ForEach(x => Targets.Add(x));
+            targetRecords.ForEach(x => Targets.Add(x));
             return this;
         }
 
@@ -64,7 +64,6 @@ namespace WatcherSdk.Host
 
             var monitoringJobs = Targets
                 .VerifyNotNull(nameof(Targets))
-                .VerifyAssert(x => x.Count > 0, "No targets")
                 .Select(x => (Target: x, Probe: ProbeFactory.Create(x, AgentId, TraceContainer)))
                 .Select(x => new MonitoringJob(x.Target, x.Probe, LoggerFactory.CreateLogger<MonitoringJob>()))
                 .ToArray();
