@@ -22,6 +22,7 @@ namespace WatcherCmd.Application
         public bool Template { get; set; }
         public bool Balance { get; set; }
         public bool Import { get; set; }
+        public bool Monitor { get; set; }
 
         public bool Agent { get; set; }
         public bool Target { get; set; }

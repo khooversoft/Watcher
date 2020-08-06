@@ -94,6 +94,7 @@ namespace WatcherCmd
                     () => option.Target && option.Delete ? container.GetRequiredService<TargetActivity>().Delete(cancellationTokenSource.Token) : Task.CompletedTask,
                     () => option.Target && option.Clear ? container.GetRequiredService<TargetActivity>().Clear(cancellationTokenSource.Token) : Task.CompletedTask,
 
+                    () => option.Monitor ? container.GetRequiredService<MonitorActivity>().Run(cancellationTokenSource.Token) : Task.CompletedTask,
                     () => option.Template ? container.GetRequiredService<TemplateActivity>().Create() : Task.CompletedTask,
                     () => option.Import ? container.GetRequiredService<ImportActivity>().Import(cancellationTokenSource.Token) : Task.CompletedTask,
                     () => option.Balance ? container.GetRequiredService<BalanceActivity>().BalanceAgents(cancellationTokenSource.Token) : Task.CompletedTask,
@@ -144,11 +145,17 @@ namespace WatcherCmd
                     IWatcherRepository watcherRepository = services.GetRequiredService<IWatcherRepository>();
                     return watcherRepository.Container.Get<TargetRecord>();
                 });
+                container.AddSingleton<IRecordContainer<TraceRecord>>(services =>
+                {
+                    IWatcherRepository watcherRepository = services.GetRequiredService<IWatcherRepository>();
+                    return watcherRepository.Container.Get<TraceRecord>();
+                });
 
                 container.AddSingleton<AgentActivity>();
                 container.AddSingleton<TargetActivity>();
                 container.AddSingleton<BalanceActivity>();
                 container.AddSingleton<ImportActivity>();
+                container.AddSingleton<MonitorActivity>();
             }
 
             return container.BuildServiceProvider();

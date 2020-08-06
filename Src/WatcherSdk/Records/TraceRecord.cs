@@ -31,6 +31,27 @@ namespace WatcherSdk.Records
 
         public long? ProbeMs { get; set; }
 
+        public void Prepare() => Id = Id.VerifyNotEmpty(nameof(Id)).ToLowerInvariant();
+
+        public override string ToString()
+        {
+            var lines = new[]
+            {
+                $"Id={Id}",
+                $"TargetId={TargetId}",
+                $"AgentId={AgentId}",
+                $"Url={Url}",
+                $"HttpStatusCode={HttpStatusCode}",
+                $"Body={Body}",
+                $"TargetState={TargetState}",
+                $"Exception={Exception}",
+                $"ProbeMs={ProbeMs}",
+            };
+
+            return string.Join(", ", lines);
+        }
+
+
         public override bool Equals(object? obj)
         {
             return obj is TraceRecord record &&
@@ -47,8 +68,6 @@ namespace WatcherSdk.Records
         }
 
         public override int GetHashCode() => HashCode.Combine(Id, Timestamp, TargetId, AgentId);
-
-        public void Prepare() => Id = Id.VerifyNotEmpty(nameof(Id)).ToLowerInvariant();
 
         public static bool operator ==(TraceRecord? left, TraceRecord? right) => EqualityComparer<TraceRecord>.Default.Equals(left!, right!);
 

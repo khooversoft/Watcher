@@ -1,8 +1,8 @@
 {
-    "id": "Target_0",
-    "description": "Target_0 description",
-    "readyUrl": "http://localhost:5010/ping/ready",
-    "runningUrl": "http://localhost:5010/ping/running",
+    "id": "Target_1",
+    "description": "Target_1 description",
+    "readyUrl": "http://localhost:5020/ping/ready",
+    "runningUrl": "http://localhost:5020/ping/running",
     "statusCodeMaps": [
         {
             "httpStatusCode": 200,
@@ -27,7 +27,7 @@
     ],
     "targetType": "REST",
     "enabled": true,
-    "frequencyInSeconds": 20,
+    "frequencyInSeconds": 10,
     "assignedAgentId": "agent_0",
     "recordType": "TargetRecord"
 }

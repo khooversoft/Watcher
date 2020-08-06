@@ -52,6 +52,7 @@ namespace TestRestApiServer.Application
             {
                 option = new ConfigurationBuilder()
                     .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddCommandLine(args)
                     .Func(x => configFile.ToNullIfEmpty() switch { string v => x.AddJsonFile(configFile), _ => x })
                     .Build()
                     .Bind<Option>();

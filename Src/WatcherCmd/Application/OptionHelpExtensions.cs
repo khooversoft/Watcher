@@ -19,6 +19,7 @@ namespace WatcherCmd.Application
                 "",
                 "Import                : Import entity",
                 "Balance               : Load balance Agent's assignments for Target",
+                "Monitor               : Monitor trace information logged by agents",
                 "",
                 "",
                 "To work with Agent, Target records, specify the entity and operations" +
@@ -27,7 +28,6 @@ namespace WatcherCmd.Application
                 "Entity",
                 "  Agent               : Operate on Agent records",
                 "  Target              : Operate on Target records",
-                "  Assignment          : Target assignment to agent",
                 "",
                 "Record operation records",
                 "  List                : List agent or target records",
@@ -35,7 +35,6 @@ namespace WatcherCmd.Application
                 "  Delete              : Delete agent or target record, requires Id={id}",
                 "  Clear               : Delete all entity records",
                 "  Template            : Create template JSON file for specified entity, writes to File={file}",
-                "  Sync                : Sync entities in Json source file with repository, requires to File={file}",
                 "",
                 "File={file}           : Json record file for 'Create' or 'Template' operation",
                 "                      :  Use the correct Json format for the Entity",

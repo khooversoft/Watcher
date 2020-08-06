@@ -2,7 +2,7 @@
   "profiles": {
     "WatcherCmd": {
       "commandName": "Project",
-      "commandLineArgs": "import file=D:\\Sources\\Watcher\\Test\\WatcherCmd.Test\\TestData\\Entities\\* configfile=D:\\Sources\\Watcher\\Src\\WatcherCmd\\Configs\\DevConfig.json"
+      "commandLineArgs": "monitor configfile=D:\\Sources\\Watcher\\Src\\WatcherCmd\\Configs\\DevConfig.json"
     }
   }
 }

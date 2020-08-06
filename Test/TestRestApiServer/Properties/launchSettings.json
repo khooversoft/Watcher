@@ -11,6 +11,7 @@
   "profiles": {
     "TestRestApiServer": {
       "commandName": "Project",
+      "commandLineArgs": "Port=5050",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Toolbox.Extensions;
 using Toolbox.Tools;
 using WatcherSdk.Records;
 
@@ -17,10 +18,15 @@ namespace WatcherSdk.Repository
                 .VerifyNotEmpty(nameof(agentId))
                 .ToLowerInvariant();
 
-            string search = $"select * from ROOT r where r.AssignedAgentId = \"{agentId}\"";
+            var parameters = new KeyValuePair<string, string>[]
+            {
+                new KeyValuePair<string, string>(agentId, agentId),
+            };
 
-            logger.LogInformation($"{nameof(GetAssignments)}: Searching for agent assignments, search={search}");
-            return container.Search(search, token);
+            string search = $"select * from ROOT r where r.AssignedAgentId = @agentId";
+
+            logger.LogInformation($"{nameof(GetAssignments)}: Searching for agent assignments, search={search.WithParameters(parameters)}");
+            return container.Search(search, parameters, token);
         }
     }
 }

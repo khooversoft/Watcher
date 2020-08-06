@@ -19,6 +19,7 @@ namespace WatcherCmd.Application
         KeyVaultOption? KeyVault { get; set; }
         bool List { get; set; }
         string? LogFolder { get; set; }
+        bool Monitor { get; set; }
         IPropertyResolver PropertyResolver { get; set; }
         ISecretFilter SecretFilter { get; set; }
         string? SecretId { get; set; }

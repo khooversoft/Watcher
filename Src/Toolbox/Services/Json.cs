@@ -16,16 +16,16 @@ namespace Toolbox.Services
         {
             PropertyNameCaseInsensitive = true,
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        }
-        .Action(x => x.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)));
+            Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
+        };
 
         private static readonly JsonSerializerOptions _formatOption = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true,
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             WriteIndented = true,
-        }
-        .Action(x => x.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)));
+            Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
+        };
 
         public static Json Default { get; } = new Json();
 

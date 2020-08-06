@@ -6,12 +6,12 @@
 param (
     [string] $Folder = "Entities\*",
 
-    [string] $ConfigFile = "..\..\..\Src\WatcherCmd\Configs\DevConfig.json"
+    [string] $ConfigFile = "..\..\Src\WatcherCmd\Configs\DevConfig.json"
 )
 
 $ErrorActionPreference = "Stop";
 
-$watcherCmdExePath = Join-Path -Path $PSScriptRoot -ChildPath "..\..\..\Src\WatcherCmd\bin\Debug\netcoreapp3.1\WatcherCmd.exe";
+$watcherCmdExePath = Join-Path -Path $PSScriptRoot -ChildPath "..\..\Src\WatcherCmd\bin\Debug\netcoreapp3.1\WatcherCmd.exe";
 if( !(Test-Path -Path $watcherCmdExePath -PathType Leaf ) )
 {
     Write-Error "$watcherCmdExePath does not exist";

@@ -12,13 +12,14 @@ using Toolbox.Services;
 using WatcherSdk.Models;
 using WatcherSdk.Records;
 using WatcherSdk.Repository;
+using System.Linq;
 
 namespace Watcher.Cosmos.Repository
 {
     public class RecordContainer<T> : IRecordContainer<T> where T : IRecord
     {
-        private readonly Container _container;
         private readonly ILogger<T> _logger;
+        private readonly Container _container;
 
         private static readonly HashSet<int> _validStatusCode = new HashSet<int>(new[]
         {
@@ -35,6 +36,7 @@ namespace Watcher.Cosmos.Repository
             _container = container;
             _logger = logger;
         }
+
 
         public string ContainerName => _container.Id;
 
@@ -123,22 +125,43 @@ namespace Watcher.Cosmos.Repository
             }
         }
 
-        public async Task<bool> Exist(string id, CancellationToken token = default) =>
-            (await Search($"select * from ROOT r where r.id = \"{id.VerifyNotEmpty(nameof(id)).ToLowerInvariant()}\"", token))
-            .Count > 0;
+        public async Task<bool> Exist(string id, CancellationToken token = default)
+        {
+            id.VerifyNotEmpty(nameof(id)).ToLowerInvariant();
 
-        public Task<IReadOnlyList<T>> ListAll(CancellationToken token = default) => Search("select * from ROOT", token);
+            KeyValuePair<string, string>[] parameters = new[]
+            {
+                new KeyValuePair<string, string>("id", id)
+            };
 
-        public async Task<IReadOnlyList<T>> Search(string sqlQuery, CancellationToken token = default)
+            var result = await Search($"select * from ROOT r where r.id = @id", parameters, token);
+
+            return result.Count > 0;
+        }
+
+        public Task<IReadOnlyList<T>> ListAll(CancellationToken token = default) => Search("select * from ROOT", token: token);
+
+        public async Task<IReadOnlyList<T>> Search(string sqlQuery, IEnumerable<KeyValuePair<string, string>>? parameters = null, CancellationToken token = default)
         {
             sqlQuery.VerifyNotEmpty(nameof(sqlQuery));
+            parameters = parameters ?? Array.Empty<KeyValuePair<string, string>>();
 
             try
             {
                 var list = new List<T>();
 
-                _logger.LogTrace($"{nameof(Search)}: Query={sqlQuery}");
+                _logger.LogTrace($"{nameof(Search)}: Query={sqlQuery.WithParameters(parameters)}");
                 var queryDefinition = new QueryDefinition(sqlQuery);
+
+                queryDefinition = parameters
+                    .Select(x => queryDefinition.WithParameter(x.Key, x.Value))
+                    .LastOrDefault()
+                    ?? queryDefinition;
+
+                //foreach (var parameter in parameters)
+                //{
+                //    queryDefinition = queryDefinition.WithParameter(parameter.Key, parameter.Value);
+                //}
 
                 using FeedIterator<T> feedIterator = _container.GetItemQueryIterator<T>(queryDefinition);
 
@@ -150,11 +173,11 @@ namespace Watcher.Cosmos.Repository
                     }
                 }
 
-                _logger.LogTrace($"{nameof(Search)}: Query={sqlQuery}, RecordCount={list.Count}");
+                _logger.LogTrace($"{nameof(Search)}: Query={sqlQuery.WithParameters(parameters)}, RecordCount={list.Count}");
 
                 return list;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogWarning($"{nameof(Search)}: Error {ex.Message} for {sqlQuery}");
                 return Array.Empty<T>();

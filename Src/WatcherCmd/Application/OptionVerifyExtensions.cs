@@ -13,7 +13,7 @@ using System.IO;
 
 namespace WatcherCmd.Application
 {
-    internal static class OptionExtensions
+    internal static class OptionVerifyExtensions
     {
         private static bool TestStore(Option option)
         {
@@ -54,6 +54,9 @@ namespace WatcherCmd.Application
             x => x.Import
                 && TestStore(x)
                 && x.File.VerifyNotEmpty("Import requires 'File'") != null,
+
+            x => x.Monitor
+                && TestStore(x),
         };
 
         public static Option Verify(this Option option)
