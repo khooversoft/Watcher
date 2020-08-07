@@ -21,22 +21,42 @@ if( !(Test-Path -Path $watcherCmdExePath -PathType Leaf ) )
 $testApiServerExePath = Join-Path -Path $PSScriptRoot -ChildPath "..\..\Test\TestRestApiServer\bin\Debug\netcoreapp3.1\TestRestApiServer.exe";
 if( !(Test-Path -Path $testApiServerExePath -PathType Leaf ) )
 {
-    Write-Error "$testApiServerExePath does not exist";
+    Write-Error "$testApiServerExePath does not 
+    exist";
     Exit(1);
 }
 
-$agentExePath = Join-Path -Path $PSScriptRoot -ChildPath "..\..\Test\TestRestApiServer\bin\Debug\netcoreapp3.1\TestRestApiServer.exe";
+$agentExePath = Join-Path -Path $PSScriptRoot -ChildPath "..\..\Src\WatcherAgent\bin\Debug\netcoreapp3.1\WatcherAgent.exe";
 if( !(Test-Path -Path $agentExePath -PathType Leaf ) )
 {
     Write-Error "$agentExePath does not exist";
     Exit(1);
 }
 
+function StartProcess {
+    param (
+        [string] $exe,
+        [string] $arg
+    )
+
+    Write-Host "Process: Starting... $exe";
+    Write-Host "         Argument... $arg";
+
+    $workingFolder = Split-Path -Path $exe -Parent;
+
+    Start-Process -FilePath pwsh.exe -WorkingDirectory $workingFolder -ArgumentList "-NoExit -Command $exe $arg";
+}
+
+# Make sure the DB is initialized
+& .\Load-TestData.ps1;
+
 # Start API Test Servers
-Start-Process -FilePath pwsh.exe -ArgumentList "-NoExit -Command $testApiServerExePath Port=5010";
-Start-Process -FilePath pwsh.exe -ArgumentList "-NoExit -Command $testApiServerExePath Port=5020";
-Start-Process -FilePath pwsh.exe -ArgumentList "-NoExit -Command $testApiServerExePath Port=5030";
+StartProcess -exe $testApiServerExePath -arg "Port=5010"
+StartProcess -exe $testApiServerExePath -arg "Port=5020"
+StartProcess -exe $testApiServerExePath -arg "Port=5030"
 
-Start-Process -FilePath pwsh.exe -ArgumentList "-NoExit -Command $agentExePath AgentId=agent_0";
+# Start agent
+StartProcess -exe $agentExePath -arg "AgentId=agent_0";
 
-# Start-Process -FilePath pwsh.exe -ArgumentList "-NoExit -Command $watcherCmdExePath Monitor configFile=$ConfigFile";
+# Start monitor
+StartProcess -exe $watcherCmdExePath -arg "Monitor configFile=$ConfigFile";

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ using Watcher.Cosmos.Repository;
 using Watcher.Cosmos.Repository.Application;
 using WatcherCmd.Application;
 using WatcherSdk.Records;
+using Toolbox.Extensions;
 
 namespace WatcherCmd.Activities
 {
@@ -57,11 +59,16 @@ namespace WatcherCmd.Activities
                 await changeFeedProcessor.StartAsync();
                 _logger.LogInformation("Feed process has started");
 
-                try { await Task.Delay(-1, tokenSource.Token); }
+                try
+                {
+                    await Task.Delay(-1, tokenSource.Token);
+                }
                 catch { }
-
-                await changeFeedProcessor.StopAsync();
-                _logger.LogInformation("Feed process has stopped");
+                finally
+                {
+                    await changeFeedProcessor.StopAsync();
+                    _logger.LogInformation("Feed process has stopped");
+                }
 
                 cts.SetResult(true);
             });
@@ -76,7 +83,18 @@ namespace WatcherCmd.Activities
         {
             foreach (TraceRecord item in changes)
             {
-                _logger.LogInformation($"Detected operation for item with id {item.Id}, Item={{ {item} }}.");
+                var items = item.GetPropertyValues();
+
+                string line = new[]
+                {
+                    "Detected operation for item",
+                }
+                .Concat(items.Select((x, i) => $"{x.Key}={{v{i}}}"))
+                .Select(x => x + Environment.NewLine)
+                .Aggregate(string.Empty, (a, x) => a + x)
+                .Func(x => x.Substring(0, x.Length));
+
+                _logger.LogInformation(line, items.Select(x => x.Value).ToArray());
             }
 
             return Task.CompletedTask;

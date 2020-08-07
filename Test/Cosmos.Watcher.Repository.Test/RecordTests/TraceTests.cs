@@ -46,7 +46,7 @@ namespace Cosmos.Watcher.Repository.Test.RecordTests
                 Url = "http://localhost",
                 HttpStatusCode = HttpStatusCode.BadRequest,
                 Body = "this is the body",
-                TargetState = TargetState.Ok
+                TargetState = TargetState.Ok.ToString(),
             };
 
             ETag etag = await container.Set(record);
@@ -93,7 +93,7 @@ namespace Cosmos.Watcher.Repository.Test.RecordTests
                 Url = "http://localhost",
                 HttpStatusCode = HttpStatusCode.BadRequest,
                 Body = "this is the body",
-                TargetState = TargetState.Ok
+                TargetState = TargetState.Ok.ToString(),
             };
 
             ETag etag = await container.Set(record);
@@ -139,7 +139,7 @@ namespace Cosmos.Watcher.Repository.Test.RecordTests
                     Url = "http://localhost",
                     HttpStatusCode = HttpStatusCode.BadRequest,
                     Body = "this is the body",
-                    TargetState = TargetState.Ok
+                    TargetState = TargetState.Ok.ToString(),
                 })
                 .ToArray();
 

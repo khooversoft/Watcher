@@ -134,7 +134,7 @@ namespace Watcher.Cosmos.Repository
                 new KeyValuePair<string, string>("id", id)
             };
 
-            var result = await Search($"select * from ROOT r where r.id = @id", parameters, token);
+            var result = await Search($"select * from ROOT r where r.id = \"@id\"", parameters, token);
 
             return result.Count > 0;
         }
@@ -154,7 +154,7 @@ namespace Watcher.Cosmos.Repository
                 var queryDefinition = new QueryDefinition(sqlQuery);
 
                 queryDefinition = parameters
-                    .Select(x => queryDefinition.WithParameter(x.Key, x.Value))
+                    .Select(x => queryDefinition.WithParameter(decorateKey(x.Key), x.Value))
                     .LastOrDefault()
                     ?? queryDefinition;
 
@@ -182,6 +182,8 @@ namespace Watcher.Cosmos.Repository
                 _logger.LogWarning($"{nameof(Search)}: Error {ex.Message} for {sqlQuery}");
                 return Array.Empty<T>();
             }
+
+            static string decorateKey(string key) => key.StartsWith("@") ? key : "@" + key;
         }
 
         private bool IsValid(HttpStatusCode httpStatusCode) => _validStatusCode.Contains((int)httpStatusCode);

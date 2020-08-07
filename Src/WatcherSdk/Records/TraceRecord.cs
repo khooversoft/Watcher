@@ -1,8 +1,10 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Text;
+using Toolbox.Extensions;
 using Toolbox.Tools;
 using WatcherSdk.Models;
 
@@ -25,7 +27,7 @@ namespace WatcherSdk.Records
 
         public string? Body { get; set; }
 
-        public TargetState TargetState { get; set; }
+        public string? TargetState { get; set; }
 
         public string? Exception { get; set; }
 
@@ -33,24 +35,22 @@ namespace WatcherSdk.Records
 
         public void Prepare() => Id = Id.VerifyNotEmpty(nameof(Id)).ToLowerInvariant();
 
-        public override string ToString()
+        public override string ToString() => GetPropertyValues()
+            .Select(x => $"{x.Key}={x.Value}")
+            .Func(x => string.Join(", ", x));
+
+        public IReadOnlyList<KeyValuePair<string, string?>> GetPropertyValues() => new KeyValuePair<string, string?>[]
         {
-            var lines = new[]
-            {
-                $"Id={Id}",
-                $"TargetId={TargetId}",
-                $"AgentId={AgentId}",
-                $"Url={Url}",
-                $"HttpStatusCode={HttpStatusCode}",
-                $"Body={Body}",
-                $"TargetState={TargetState}",
-                $"Exception={Exception}",
-                $"ProbeMs={ProbeMs}",
-            };
-
-            return string.Join(", ", lines);
-        }
-
+            new KeyValuePair<string, string?>("Id", Id),
+            new KeyValuePair<string, string?>("TargetId", TargetId),
+            new KeyValuePair<string, string?>("AgentId", AgentId),
+            new KeyValuePair<string, string?>("Url", Url),
+            new KeyValuePair<string, string?>("HttpStatusCode", HttpStatusCode.ToString()),
+            new KeyValuePair<string, string?>("Body", Body),
+            new KeyValuePair<string, string?>("TargetState", TargetState),
+            new KeyValuePair<string, string?>("Exception", Exception),
+            new KeyValuePair<string, string?>("ProbeMs", ProbeMs?.ToString() ?? string.Empty),
+        };
 
         public override bool Equals(object? obj)
         {

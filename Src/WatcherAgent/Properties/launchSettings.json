@@ -11,6 +11,7 @@
   "profiles": {
     "WatcherAgent": {
       "commandName": "Project",
+      "commandLineArgs": "AgentId=agent_0",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },

@@ -19,7 +19,7 @@ namespace WatcherSdk.Records
                 Url = targetRecord.ReadyUrl,
                 HttpStatusCode = httpStatusCode,
                 Body = body,
-                TargetState = TargetState.Ok,
+                TargetState = TargetState.Ok.ToString(),
                 ProbeMs = ms,
             };
         }
@@ -33,7 +33,7 @@ namespace WatcherSdk.Records
                 Url = targetRecord.ReadyUrl,
                 HttpStatusCode = httpStatusCode,
                 Body = body,
-                TargetState = TargetState.Error,
+                TargetState = TargetState.Error.ToString(),
                 Exception = ex,
             };
         }

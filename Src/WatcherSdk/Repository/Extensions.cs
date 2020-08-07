@@ -20,7 +20,7 @@ namespace WatcherSdk.Repository
 
             var parameters = new KeyValuePair<string, string>[]
             {
-                new KeyValuePair<string, string>(agentId, agentId),
+                new KeyValuePair<string, string>("agentId", agentId),
             };
 
             string search = $"select * from ROOT r where r.AssignedAgentId = @agentId";
